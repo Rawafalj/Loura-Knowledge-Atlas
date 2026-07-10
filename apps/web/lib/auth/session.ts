@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -49,9 +50,11 @@ export async function getCurrentMembership(
   };
 }
 
-export async function requireWorkspaceMembership() {
-  const user = await requireAuthenticatedUser();
-  const membership = await getCurrentMembership(user.id);
-  if (!membership) redirect("/onboarding");
-  return { user, membership };
-}
+export const requireWorkspaceMembership = cache(
+  async function requireWorkspaceMembership() {
+    const user = await requireAuthenticatedUser();
+    const membership = await getCurrentMembership(user.id);
+    if (!membership) redirect("/onboarding");
+    return { user, membership };
+  },
+);

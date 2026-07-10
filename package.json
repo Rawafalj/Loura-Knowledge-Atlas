@@ -18,6 +18,7 @@
     "test": "turbo run test",
     "test:db": "supabase test db && tsx scripts/test-seed-import.ts",
     "test:e2e": "pnpm --filter @loura/web test:e2e",
+    "test:e2e:service": "pnpm --filter @loura/web test:e2e:service",
     "db:generate": "pnpm --filter @loura/db db:generate",
     "db:migrate": "supabase migration up --local",
     "db:seed": "supabase db reset --local",

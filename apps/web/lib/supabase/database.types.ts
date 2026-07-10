@@ -721,6 +721,29 @@ export type Database = {
         Args: { p_name: string; p_seed?: Json; p_slug: string };
         Returns: string;
       };
+      concept_snapshot: {
+        Args: { p_concept_id: string };
+        Returns: Json;
+      };
+      create_atlas_concept: {
+        Args: {
+          p_change_summary: string;
+          p_payload: Json;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      create_atlas_relation: {
+        Args: {
+          p_description: string;
+          p_relation_type_id: string;
+          p_review_status: Database["public"]["Enums"]["content_status"];
+          p_source_concept_id: string;
+          p_target_concept_id: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
       install_atlas_seed: {
         Args: { p_seed: Json; p_workspace_id: string };
         Returns: Json;
@@ -742,6 +765,49 @@ export type Database = {
           p_workspace_id: string;
         };
         Returns: string;
+      };
+      shares_workspace_with: {
+        Args: { profile_uuid: string };
+        Returns: boolean;
+      };
+      remove_atlas_relation: {
+        Args: {
+          p_expected_updated_at: string;
+          p_relation_id: string;
+          p_workspace_id: string;
+        };
+        Returns: undefined;
+      };
+      replace_concept_aliases: {
+        Args: {
+          p_aliases: Json;
+          p_concept_id: string;
+          p_workspace_id: string;
+        };
+        Returns: undefined;
+      };
+      update_atlas_concept: {
+        Args: {
+          p_change_summary: string;
+          p_concept_id: string;
+          p_expected_updated_at: string;
+          p_payload: Json;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      update_atlas_relation: {
+        Args: {
+          p_description: string;
+          p_expected_updated_at: string;
+          p_relation_id: string;
+          p_relation_type_id: string;
+          p_review_status: Database["public"]["Enums"]["content_status"];
+          p_source_concept_id: string;
+          p_target_concept_id: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
       };
     };
     Enums: {

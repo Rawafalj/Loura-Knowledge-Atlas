@@ -89,7 +89,7 @@ The v0.1 product is complete when an authenticated owner can:
 
 ## Repository status
 
-Milestone 1 establishes authentication, first-owner workspace bootstrap, the canonical atlas schema, role-aware RLS, transactional graph invariants, audit/revision foundations, and the validated ten-area seed importer. Reading and authoring workflows, source ingestion, graph visualization, and live AI remain intentionally deferred to later milestones.
+Milestone 2 adds the reading-first world, domain, and concept experience; structured concept and relation authoring; Markdown synthesis; immutable concept revisions; accessible relationship and history views; and transactional audit-backed mutations. Graph visualization, hybrid retrieval, source ingestion, and live AI remain intentionally deferred to later milestones.
 
 ## Prerequisites
 
@@ -130,7 +130,7 @@ Health endpoints:
 - web: `http://127.0.0.1:3000/api/health`
 - worker: `http://127.0.0.1:8091/healthz`
 
-The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 1.
+The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 2.
 
 ## Verification
 
@@ -138,9 +138,10 @@ The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is
 pnpm verify
 pnpm test:db
 pnpm test:e2e
+pnpm test:e2e:service
 ```
 
-`pnpm verify` runs formatting checks, JavaScript and Python linting, strict type checks, unit tests, worker tests, and the production web build. Playwright runs separately because it starts a web server and requires its browser runtime.
+`pnpm verify` runs formatting checks, JavaScript and Python linting, strict type checks, unit and component tests, worker tests, and the production web build. Playwright runs separately because it starts a web server and requires its browser runtime. `pnpm test:e2e:service` additionally exercises authenticated owner and viewer workflows against local Supabase.
 
 Database commands are available at the repository root:
 
@@ -159,4 +160,4 @@ Copy `.env.example` locally and never commit real credentials. Supabase service-
 
 ## Dependency policy
 
-Exact direct versions and roles are recorded in `docs/DEPENDENCIES.md`. Production dependencies are deliberately minimal in Milestone 0; Docling and provider SDKs are deferred until their implementing milestones.
+Exact direct versions and roles are recorded in `docs/DEPENDENCIES.md`. Docling and provider SDKs remain deferred until their implementing milestones.
