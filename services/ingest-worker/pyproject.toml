@@ -1,0 +1,43 @@
+[project]
+name = "loura-ingest-worker"
+version = "0.1.0"
+description = "Loura Knowledge Atlas ingestion worker scaffold"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "pydantic==2.13.4",
+]
+
+[project.scripts]
+loura-ingest-worker = "loura_ingest_worker.main:main"
+
+[dependency-groups]
+dev = [
+  "mypy==2.2.0",
+  "pytest==9.1.1",
+  "ruff==0.15.21",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/loura_ingest_worker"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["loura_ingest_worker"]
+mypy_path = "src"
+

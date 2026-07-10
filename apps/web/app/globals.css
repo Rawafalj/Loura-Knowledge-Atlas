@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  background: #f7f7f5;
+  color: #181817;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #555550;
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
