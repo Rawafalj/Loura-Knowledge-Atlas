@@ -16,19 +16,23 @@
     "format:check": "prettier --check .",
     "typecheck": "turbo run typecheck && pnpm worker:typecheck",
     "test": "turbo run test",
+    "test:db": "supabase test db && tsx scripts/test-seed-import.ts",
     "test:e2e": "pnpm --filter @loura/web test:e2e",
-    "db:generate": "supabase db diff --local --schema public",
+    "db:generate": "pnpm --filter @loura/db db:generate",
     "db:migrate": "supabase migration up --local",
     "db:seed": "supabase db reset --local",
     "worker:dev": "uv run --project services/ingest-worker loura-ingest-worker",
     "worker:test": "uv run --project services/ingest-worker pytest services/ingest-worker/tests",
     "worker:lint": "uv run --project services/ingest-worker ruff check services/ingest-worker",
     "worker:typecheck": "uv run --project services/ingest-worker mypy services/ingest-worker/src",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm worker:test && pnpm build"
+    "seed:validate": "tsx scripts/validate-atlas.ts seed/atlas.yaml",
+    "verify": "pnpm seed:validate && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm worker:test && pnpm build"
   },
   "devDependencies": {
     "prettier": "3.9.5",
+    "postgres": "3.4.9",
     "supabase": "2.109.1",
+    "tsx": "4.23.0",
     "turbo": "2.10.4"
   }
 }

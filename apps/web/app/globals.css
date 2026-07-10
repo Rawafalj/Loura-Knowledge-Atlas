@@ -30,3 +30,109 @@ p {
   font-size: 1.125rem;
   line-height: 1.7;
 }
+
+.eyebrow {
+  color: #77776f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.auth-page {
+  max-width: 34rem;
+}
+
+.stack {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+label {
+  font-weight: 650;
+}
+
+input {
+  background: white;
+  border: 1px solid #c9c9c1;
+  border-radius: 0.4rem;
+  color: inherit;
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid #395f92;
+  outline-offset: 2px;
+}
+
+button {
+  background: #20201d;
+  border: 1px solid #20201d;
+  border-radius: 0.4rem;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+button.secondary {
+  background: transparent;
+  color: #20201d;
+}
+
+.checkbox-row {
+  align-items: center;
+  display: flex;
+  gap: 0.65rem;
+  margin: 0.5rem 0;
+}
+
+.checkbox-row input {
+  min-height: auto;
+}
+
+.message {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.message.error {
+  color: #9c2727;
+}
+
+.facts {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 2rem 0;
+}
+
+.facts div {
+  background: white;
+  border: 1px solid #ddddd5;
+  border-radius: 0.4rem;
+  padding: 1rem;
+}
+
+.facts dt {
+  color: #77776f;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.facts dd {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0;
+}

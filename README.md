@@ -89,7 +89,7 @@ The v0.1 product is complete when an authenticated owner can:
 
 ## Repository status
 
-Milestone 0 establishes the repository and developer environment only. It intentionally does not include authentication, atlas tables, source ingestion, graph features, or live AI calls. Those capabilities are implemented sequentially according to `docs/06_IMPLEMENTATION_PLAN.md`.
+Milestone 1 establishes authentication, first-owner workspace bootstrap, the canonical atlas schema, role-aware RLS, transactional graph invariants, audit/revision foundations, and the validated ten-area seed importer. Reading and authoring workflows, source ingestion, graph visualization, and live AI remain intentionally deferred to later milestones.
 
 ## Prerequisites
 
@@ -113,8 +113,11 @@ cp .env.example .env.local
 pnpm install --frozen-lockfile
 uv sync --project services/ingest-worker --frozen
 pnpm exec supabase start
+pnpm db:seed
 pnpm dev
 ```
+
+After Supabase starts, run `pnpm exec supabase status` and copy its local anonymous key into `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`. The local API and database URLs already match `.env.example`.
 
 In another terminal, start the worker health process:
 
@@ -127,12 +130,13 @@ Health endpoints:
 - web: `http://127.0.0.1:3000/api/health`
 - worker: `http://127.0.0.1:8091/healthz`
 
-The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 0.
+The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 1.
 
 ## Verification
 
 ```bash
 pnpm verify
+pnpm test:db
 pnpm test:e2e
 ```
 
@@ -144,9 +148,10 @@ Database commands are available at the repository root:
 pnpm db:generate
 pnpm db:migrate
 pnpm db:seed
+pnpm test:db
 ```
 
-Milestone 0 contains no atlas migration or seed data. These commands target the local Supabase instance and become substantive in Milestone 1.
+`pnpm db:seed` rebuilds the local database from the single Supabase migration history. `pnpm test:db` requires local Supabase and verifies RLS, role boundaries, workspace isolation, graph invariants under concurrent writes, and seed-import idempotency.
 
 ## Environment and secrets
 

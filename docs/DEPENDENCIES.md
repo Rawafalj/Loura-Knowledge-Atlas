@@ -1,16 +1,21 @@
-# Milestone 0 Dependency Inventory
+# Dependency Inventory through Milestone 1
 
 Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockfiles.
 
 ## Production runtime
 
-| Dependency | Version | Role                                                  | License |
-| ---------- | ------: | ----------------------------------------------------- | ------- |
-| Next.js    | 16.2.10 | Web framework and server runtime                      | MIT     |
-| React      |  19.2.7 | Web rendering                                         | MIT     |
-| React DOM  |  19.2.7 | Browser rendering                                     | MIT     |
-| Zod        |   4.4.3 | External input and AI fixture validation              | MIT     |
-| Pydantic   |  2.13.4 | Worker configuration and structured-output validation | MIT     |
+| Dependency   | Version | Role                                                  | License    |
+| ------------ | ------: | ----------------------------------------------------- | ---------- |
+| Next.js      | 16.2.10 | Web framework and server runtime                      | MIT        |
+| React        |  19.2.7 | Web rendering                                         | MIT        |
+| React DOM    |  19.2.7 | Browser rendering                                     | MIT        |
+| Zod          |   4.4.3 | External input and AI fixture validation              | MIT        |
+| Pydantic     |  2.13.4 | Worker configuration and structured-output validation | MIT        |
+| Supabase JS  | 2.110.2 | Typed authentication and user-scoped database access  | MIT        |
+| Supabase SSR |  0.12.0 | Cookie-backed server authentication sessions          | MIT        |
+| Drizzle ORM  |  0.45.2 | Canonical TypeScript database schema                  | Apache-2.0 |
+| Postgres.js  |   3.4.9 | Local database integration and concurrency tests      | Unlicense  |
+| YAML         |   2.9.0 | Atlas seed parsing                                    | ISC        |
 
 The worker health endpoint uses the Python standard library. Docling and both OpenAI SDKs are intentionally deferred to their implementation milestones.
 
@@ -27,6 +32,8 @@ The worker health endpoint uses the Python standard library. Docling and both Op
 | Vitest                      |           4.1.10 |
 | Playwright                  |           1.61.1 |
 | Supabase CLI                |          2.109.1 |
+| Drizzle Kit                 |          0.31.10 |
+| tsx                         |           4.23.0 |
 | Python                      |          3.12.13 |
 | uv                          |          0.11.28 |
 | Pytest                      |            9.1.1 |

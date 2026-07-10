@@ -1,0 +1,209 @@
+version: 1
+
+domains:
+  - slug: research-reasoning-measurement
+    title: Research, Reasoning, and Measurement
+    kind: root
+    shortDescription: How do we form, test, qualify, and revise reliable beliefs?
+    sortOrder: 0
+  - slug: mathematical-computing-foundations
+    title: Mathematical and Computing Foundations
+    kind: root
+    shortDescription: What formal and computational tools are prerequisites for the applied branches?
+    sortOrder: 1
+  - slug: systems-control-decision
+    title: Systems, Control, and Decision Sciences
+    kind: core
+    shortDescription: How do complex systems behave, decide, and remain directed toward desired states?
+    sortOrder: 2
+  - slug: organizations-coordination-work
+    title: Organizations, Coordination, and Operational Work
+    kind: core
+    shortDescription: How do people, teams, technologies, responsibilities, and incentives combine to produce coordinated action?
+    sortOrder: 3
+  - slug: information-data-knowledge
+    title: Information, Data, and Knowledge Systems
+    kind: core
+    shortDescription: How can operational reality be represented, stored, retrieved, related, and kept trustworthy?
+    sortOrder: 4
+  - slug: ai-reasoning-agents
+    title: Artificial Intelligence, Reasoning, and Agentic Systems
+    kind: core
+    shortDescription: How can computational systems reason, plan, use tools, act, evaluate results, and learn?
+    sortOrder: 5
+  - slug: software-distributed-integration
+    title: Software, Distributed Systems, and Enterprise Integration
+    kind: core
+    shortDescription: How can Loura be implemented dependably across unreliable, heterogeneous environments?
+    sortOrder: 6
+  - slug: human-ai-safety-governance
+    title: Human–AI Systems, Safety, Security, and Governance
+    kind: core
+    shortDescription: How can humans retain appropriate authority while using AI safely and securely?
+    sortOrder: 7
+  - slug: systems-engineering-deployment
+    title: Systems Engineering, Product Design, Deployment, and Adoption
+    kind: core
+    shortDescription: How is knowledge translated into a system that solves a real problem in a real environment?
+    sortOrder: 8
+  - slug: manufacturing-industrial-operations
+    title: Manufacturing and Industrial Operations
+    kind: overlay
+    shortDescription: How do industrial organizations plan, execute, monitor, maintain, and improve production and assets?
+    sortOrder: 9
+
+relationTypes:
+  - {
+      key: broader_than,
+      forwardLabel: broader than,
+      inverseLabel: narrower than,
+      category: hierarchy,
+      directed: true,
+      acyclic: true,
+    }
+  - {
+      key: narrower_than,
+      forwardLabel: narrower than,
+      inverseLabel: broader than,
+      category: hierarchy,
+      directed: true,
+      acyclic: true,
+    }
+  - {
+      key: part_of,
+      forwardLabel: part of,
+      inverseLabel: has part,
+      category: hierarchy,
+      directed: true,
+      acyclic: true,
+    }
+  - {
+      key: prerequisite_for,
+      forwardLabel: prerequisite for,
+      inverseLabel: requires,
+      category: learning,
+      directed: true,
+      acyclic: true,
+    }
+  - {
+      key: co_requisite_with,
+      forwardLabel: co-requisite with,
+      inverseLabel: co-requisite with,
+      category: learning,
+      directed: false,
+      symmetric: true,
+    }
+  - {
+      key: deepens,
+      forwardLabel: deepens,
+      inverseLabel: is deepened by,
+      category: learning,
+      directed: true,
+      acyclic: true,
+    }
+  - {
+      key: depends_on,
+      forwardLabel: depends on,
+      inverseLabel: supports,
+      category: explanatory,
+      directed: true,
+      acyclic: true,
+    }
+  - {
+      key: enables,
+      forwardLabel: enables,
+      inverseLabel: is enabled by,
+      category: explanatory,
+      directed: true,
+    }
+  - {
+      key: constrains,
+      forwardLabel: constrains,
+      inverseLabel: is constrained by,
+      category: explanatory,
+      directed: true,
+    }
+  - {
+      key: explains,
+      forwardLabel: explains,
+      inverseLabel: is explained by,
+      category: explanatory,
+      directed: true,
+    }
+  - {
+      key: influences,
+      forwardLabel: influences,
+      inverseLabel: is influenced by,
+      category: explanatory,
+      directed: true,
+    }
+  - {
+      key: contrasts_with,
+      forwardLabel: contrasts with,
+      inverseLabel: contrasts with,
+      category: contrast,
+      directed: false,
+      symmetric: true,
+    }
+  - {
+      key: alternative_to,
+      forwardLabel: alternative to,
+      inverseLabel: alternative to,
+      category: contrast,
+      directed: false,
+      symmetric: true,
+    }
+  - {
+      key: commonly_confused_with,
+      forwardLabel: commonly confused with,
+      inverseLabel: commonly confused with,
+      category: contrast,
+      directed: false,
+      symmetric: true,
+    }
+  - {
+      key: measured_by,
+      forwardLabel: measured by,
+      inverseLabel: measures,
+      category: epistemic,
+      directed: true,
+    }
+  - {
+      key: verified_by,
+      forwardLabel: verified by,
+      inverseLabel: verifies,
+      category: epistemic,
+      directed: true,
+    }
+  - {
+      key: implemented_by,
+      forwardLabel: implemented by,
+      inverseLabel: implements,
+      category: operational,
+      directed: true,
+    }
+  - {
+      key: governed_by,
+      forwardLabel: governed by,
+      inverseLabel: governs,
+      category: operational,
+      directed: true,
+    }
+  - {
+      key: fails_through,
+      forwardLabel: fails through,
+      inverseLabel: is a failure mode of,
+      category: operational,
+      directed: true,
+    }
+  - {
+      key: related_to,
+      forwardLabel: related to,
+      inverseLabel: related to,
+      category: explanatory,
+      directed: false,
+      symmetric: true,
+    }
+
+concepts: []
+relations: []

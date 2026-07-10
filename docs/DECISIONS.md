@@ -161,3 +161,47 @@ Supabase SQL files under `supabase/migrations` are the single deployable migrati
 ### Consequences
 
 CI will check schema/migration drift once the first schema exists. No second migration directory will be introduced.
+
+---
+
+## ADR-004 — Workspace-owned relation grammar
+
+**Status:** Accepted
+
+**Date:** 2026-07-10
+
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+Mixing nullable global relation templates with workspace-owned relation types would make ownership, customization, and RLS policies harder to reason about.
+
+### Decision
+
+Every relation type is owned by exactly one workspace in v0.1. The validated seed installer copies the system grammar into each new workspace. Symmetric relations are normalized to canonical endpoint order before persistence; inverse labels are a read-time concern.
+
+### Consequences
+
+Relation-type keys are unique per workspace, structural changes remain owner-only, and all graph rows retain an unambiguous workspace boundary. Updating the system grammar requires an explicit versioned workspace migration strategy in a later milestone.
+
+---
+
+## ADR-005 — Database-enforced graph invariants
+
+**Status:** Accepted
+
+**Date:** 2026-07-10
+
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+Service-only hierarchy and prerequisite validation can admit cycles when two valid-looking writes race.
+
+### Decision
+
+Enforce workspace-local hierarchy, endpoint, relation-kind, symmetry, self-edge, and acyclic-relation rules in PostgreSQL. Serialize competing hierarchy and acyclic relation mutations with transaction-scoped advisory locks, then run recursive cycle checks inside the same transaction.
+
+### Consequences
+
+All clients receive the same integrity guarantees, including import and future worker paths. Domain services should still pre-validate for readable errors, while PostgreSQL remains the final authority. Database integration tests deliberately race opposing writes.
