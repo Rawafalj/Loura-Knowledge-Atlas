@@ -19,6 +19,18 @@ export async function bootstrapWorkspace(
     p_seed: seed,
   });
   if (error) throw new Error(`Unable to bootstrap workspace: ${error.code}`);
+  if (seed) {
+    const { error: learningError } = await supabase.rpc(
+      "install_learning_seed",
+      {
+        p_workspace_id: data,
+        p_seed: seed,
+      },
+    );
+    if (learningError) {
+      throw new Error(`Unable to install learning seed: ${learningError.code}`);
+    }
+  }
   return data;
 }
 
@@ -32,5 +44,15 @@ export async function installAtlasSeed(
     p_seed: seed,
   });
   if (error) throw new Error(`Unable to install atlas seed: ${error.code}`);
-  return data;
+  const { data: learningData, error: learningError } = await supabase.rpc(
+    "install_learning_seed",
+    {
+      p_workspace_id: workspaceId,
+      p_seed: seed,
+    },
+  );
+  if (learningError) {
+    throw new Error(`Unable to install learning seed: ${learningError.code}`);
+  }
+  return { atlas: data, learning: learningData };
 }

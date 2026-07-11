@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { requireWorkspaceMembership } from "@/lib/auth/session";
 import { searchRequestSchema } from "@/lib/search/contracts";
 import { searchAtlas } from "@/lib/search/service";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -28,8 +28,22 @@ export async function POST(request: Request) {
     );
   }
 
-  const { membership } = await requireWorkspaceMembership();
-  if (parsed.data.workspaceId !== membership.workspaceId) {
+  const supabase = await createSupabaseServerClient();
+  const membershipResult = await supabase
+    .from("workspace_members")
+    .select("workspace_id")
+    .eq("workspace_id", parsed.data.workspaceId)
+    .limit(1)
+    .maybeSingle();
+  if (membershipResult.error) {
+    return apiError(
+      500,
+      "INTERNAL_ERROR",
+      "Unable to validate workspace access.",
+      requestId,
+    );
+  }
+  if (!membershipResult.data) {
     return apiError(
       403,
       "FORBIDDEN",
@@ -44,7 +58,7 @@ export async function POST(request: Request) {
       scope: parsed.data.scope,
       limit: parsed.data.limit,
     };
-    const results = await searchAtlas(membership.workspaceId, input);
+    const results = await searchAtlas(parsed.data.workspaceId, input);
     return NextResponse.json(results, {
       headers: { "Cache-Control": "private, no-store" },
     });

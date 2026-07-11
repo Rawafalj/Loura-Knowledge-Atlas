@@ -237,3 +237,34 @@ Concept authoring refreshes derived mock embeddings without changing canonical r
 ### Validation or reversal trigger
 
 Revisit exact vector search when the realistic performance fixture or production telemetry shows it cannot meet the one-second search target.
+
+---
+
+## ADR-007 — Learner-owned readiness and evidence
+
+**Status:** Accepted
+
+**Date:** 2026-07-11
+
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+Learning paths are canonical workspace content, while readiness and mastery are personal state. The specification requires ordered mandatory steps, explicit prerequisite thresholds, reasoned waivers, evidence-backed changes, preserved history, and viewer updates to only their own mastery.
+
+### Decision
+
+Canonical paths and ordered steps are owner/editor-maintained. A path step is complete when the learner reaches that step's target mastery. A later step is ready only when every earlier mandatory step in its branch reaches its target and each explicit `prerequisite_for` edge reaches the later step's configured prerequisite threshold. A learner may waive an explicit prerequisite only through a separate per-user, per-path record with a reason; the waiver never deletes or weakens the canonical relation.
+
+Mastery writes go through one transactional PostgreSQL function that appends evidence, upserts the learner's current record, and creates an audit event. Evidence is immutable to authenticated users. AI assessment remains absent rather than being mixed into user-approved mastery.
+
+### Alternatives considered
+
+- Marking page views as progress — rejected because reading is not evidence of understanding.
+- Storing progress directly on canonical path steps — rejected because it would mix shared curriculum with personal state.
+- Treating a waiver as relation deletion — rejected because a learner exception must not change semantic truth for the workspace.
+- Allowing direct table writes for mastery — rejected because evidence, state, and audit must commit together.
+
+### Consequences
+
+Readiness explanations remain deterministic and testable. Viewers can maintain only their own learning state while remaining unable to edit canonical routes. Optional branches retain a branch key without introducing a workflow engine.

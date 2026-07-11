@@ -1,6 +1,6 @@
 # Atlas seed
 
-`atlas.yaml` is the human-readable Milestone 1 seed skeleton. It contains ten visible top-level knowledge areas and the system relation grammar, but intentionally contains no fabricated concept content.
+`atlas.yaml` contains the ten visible top-level knowledge areas, the system relation grammar, and the deliberately curated first learning route. Its 15 route concepts are honest drafts: their concise definitions orient the route, but they are not presented as reviewed source-backed synthesis.
 
 Validate it with:
 
@@ -8,4 +8,4 @@ Validate it with:
 pnpm seed:validate
 ```
 
-The importer validates references, aliases, hierarchy cycles, acyclic relation cycles, and relation-type rules before calling the transactional database import function. Re-importing the same file is idempotent.
+The importer validates references, aliases, hierarchy cycles, acyclic relation cycles, relation-type rules, path references, duplicate steps, and prerequisite ordering before calling the transactional database import functions. Re-importing the same file is idempotent and does not overwrite curator edits.

@@ -3,11 +3,14 @@ import { notFound } from "next/navigation";
 import { Badge, EmptyState, PageHeader } from "@loura/ui";
 
 import { ConceptGraph } from "@/components/graph/concept-graph";
+import { MasteryForm } from "@/components/learning/mastery-form";
 import { Markdown } from "@/components/markdown";
 import { RelationshipTable } from "@/components/relationship-table";
 import { getConceptNeighborhood } from "@/lib/atlas/neighborhood-query";
 import { getConceptView } from "@/lib/atlas/queries";
 import { requireWorkspaceMembership } from "@/lib/auth/session";
+import { MASTERY_LEVEL_LABELS } from "@/lib/learning/contracts";
+import { getConceptMastery } from "@/lib/learning/service";
 
 const tabs = [
   "overview",
@@ -45,12 +48,18 @@ export default async function ConceptPage({
   searchParams,
 }: {
   params: Promise<{ conceptSlug: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; saved?: string; error?: string }>;
 }) {
   const [{ conceptSlug }, query] = await Promise.all([params, searchParams]);
-  const { membership } = await requireWorkspaceMembership();
+  const { user, membership } = await requireWorkspaceMembership();
   const view = await getConceptView(membership.workspaceId, conceptSlug);
   if (!view) notFound();
+  const mastery = await getConceptMastery(
+    membership.workspaceId,
+    user.id,
+    view.concept.id,
+    view.concept.target_mastery,
+  );
   const activeTab = tabFrom(query.tab);
   const canEdit = membership.role !== "viewer";
   const neighborhood =
@@ -111,9 +120,23 @@ export default async function ConceptPage({
           {view.concept.content_status}
         </Badge>
         <span>Priority: {view.concept.priority}</span>
-        <span>Target mastery: {view.concept.target_mastery ?? "Not set"}</span>
+        <span>
+          Mastery: {mastery.currentLevel} ·{" "}
+          {MASTERY_LEVEL_LABELS[mastery.currentLevel]} / target{" "}
+          {mastery.targetLevel}
+        </span>
         <span>Revision {view.revisions[0]?.revision_number ?? 0}</span>
       </div>
+      {query.saved === "mastery" ? (
+        <p className="form-banner form-banner--success" role="status">
+          Mastery and evidence saved.
+        </p>
+      ) : null}
+      {query.error ? (
+        <p className="form-banner form-banner--error" role="alert">
+          {query.error}
+        </p>
+      ) : null}
 
       {view.concept.content_status === "deprecated" ? (
         <aside className="deprecation-notice">
@@ -340,10 +363,59 @@ export default async function ConceptPage({
             )}
           </div>
           <div>
+            <p className="eyebrow">Personal mastery</p>
+            <strong>
+              {mastery.currentLevel} ·{" "}
+              {MASTERY_LEVEL_LABELS[mastery.currentLevel]}
+            </strong>
+            <p>
+              Target {mastery.targetLevel} ·{" "}
+              {MASTERY_LEVEL_LABELS[mastery.targetLevel]}
+            </p>
+            <details className="concept-mastery-control">
+              <summary>Update with evidence</summary>
+              <MasteryForm
+                compact
+                concept={{
+                  id: view.concept.id,
+                  slug: view.concept.slug,
+                  name: view.concept.canonical_name,
+                }}
+                currentLevel={mastery.currentLevel}
+                targetLevel={mastery.targetLevel}
+                status={mastery.status}
+                returnTo={`/concepts/${view.concept.slug}`}
+              />
+            </details>
+            {mastery.evidence.length ? (
+              <Link href="/mastery">
+                View {mastery.evidence.length} evidence record(s)
+              </Link>
+            ) : (
+              <p>No evidence recorded.</p>
+            )}
+          </div>
+          <div>
             <p className="eyebrow">Last updated</p>
             <time dateTime={view.concept.updated_at}>
               {new Date(view.concept.updated_at).toLocaleString()}
             </time>
+          </div>
+          <div>
+            <p className="eyebrow">Learning paths</p>
+            {mastery.paths.length ? (
+              <ul>
+                {mastery.paths.map((path) => (
+                  <li key={path.slug}>
+                    <Link href={`/paths/${path.slug}`}>
+                      Step {path.stepOrder} · {path.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Not currently assigned to a route.</p>
+            )}
           </div>
         </aside>
       </div>

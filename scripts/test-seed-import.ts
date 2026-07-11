@@ -44,6 +44,7 @@ async function main(): Promise<void> {
     JSON.stringify({
       ...baseSeed,
       concepts: [
+        ...baseSeed.concepts,
         {
           slug: "evidence",
           canonicalName: "Evidence",
@@ -58,6 +59,7 @@ async function main(): Promise<void> {
         },
       ],
       relations: [
+        ...baseSeed.relations,
         { source: "evidence", type: "prerequisite_for", target: "claim" },
       ],
     }),
@@ -97,6 +99,9 @@ async function main(): Promise<void> {
       `;
       if (!created)
         throw new Error("Workspace bootstrap returned no identifier");
+      await transaction`
+        select public.install_learning_seed(${created.workspace_id}, ${transaction.json(seed)})
+      `;
       return created.workspace_id;
     });
 
@@ -106,13 +111,17 @@ async function main(): Promise<void> {
         concepts: number;
         aliases: number;
         relations: number;
+        paths: number;
+        steps: number;
       }[]
     >`
       select
         (select count(*)::integer from public.domains where workspace_id = ${workspaceId}) as domains,
         (select count(*)::integer from public.concepts where workspace_id = ${workspaceId}) as concepts,
         (select count(*)::integer from public.concept_aliases where workspace_id = ${workspaceId}) as aliases,
-        (select count(*)::integer from public.concept_relations where workspace_id = ${workspaceId}) as relations
+        (select count(*)::integer from public.concept_relations where workspace_id = ${workspaceId}) as relations,
+        (select count(*)::integer from public.learning_paths where workspace_id = ${workspaceId}) as paths,
+        (select count(*)::integer from public.learning_path_steps where workspace_id = ${workspaceId}) as steps
     `;
 
     await sql.begin(async (transaction) => {
@@ -127,6 +136,9 @@ async function main(): Promise<void> {
       await transaction`
         select public.install_atlas_seed(${workspaceId}, ${transaction.json(seed)})
       `;
+      await transaction`
+        select public.install_learning_seed(${workspaceId}, ${transaction.json(seed)})
+      `;
     });
 
     const after = await sql<
@@ -135,16 +147,27 @@ async function main(): Promise<void> {
         concepts: number;
         aliases: number;
         relations: number;
+        paths: number;
+        steps: number;
       }[]
     >`
       select
         (select count(*)::integer from public.domains where workspace_id = ${workspaceId}) as domains,
         (select count(*)::integer from public.concepts where workspace_id = ${workspaceId}) as concepts,
         (select count(*)::integer from public.concept_aliases where workspace_id = ${workspaceId}) as aliases,
-        (select count(*)::integer from public.concept_relations where workspace_id = ${workspaceId}) as relations
+        (select count(*)::integer from public.concept_relations where workspace_id = ${workspaceId}) as relations,
+        (select count(*)::integer from public.learning_paths where workspace_id = ${workspaceId}) as paths,
+        (select count(*)::integer from public.learning_path_steps where workspace_id = ${workspaceId}) as steps
     `;
 
-    const expected = { domains: 10, concepts: 2, aliases: 1, relations: 1 };
+    const expected = {
+      domains: 10,
+      concepts: 17,
+      aliases: 2,
+      relations: 15,
+      paths: 1,
+      steps: 15,
+    };
     if (JSON.stringify(before[0]) !== JSON.stringify(expected)) {
       throw new Error(
         `Unexpected first import counts: ${JSON.stringify(before[0])}`,

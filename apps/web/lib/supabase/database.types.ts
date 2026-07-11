@@ -89,6 +89,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "audit_events_actor_user_id_profiles_id_fk";
+            columns: ["actor_user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "audit_events_workspace_id_workspaces_id_fk";
             columns: ["workspace_id"];
             isOneToOne: false;
@@ -209,7 +216,21 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "concept_relations_created_by_profiles_id_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "concept_relations_reviewed_by_profile_fk";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "concept_relations_reviewed_by_profiles_id_fk";
             columns: ["reviewed_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -298,6 +319,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "concept_revisions_created_by_profiles_id_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "concept_revisions_workspace_id_workspaces_id_fk";
             columns: ["workspace_id"];
             isOneToOne: false;
@@ -362,7 +390,7 @@ export type Database = {
           priority?: Database["public"]["Enums"]["content_priority"];
           replacement_concept_id?: string | null;
           review_note?: string | null;
-          search_document?: never;
+          search_document?: unknown;
           slug: string;
           synthesis_markdown?: string;
           target_mastery?: number | null;
@@ -394,7 +422,7 @@ export type Database = {
           priority?: Database["public"]["Enums"]["content_priority"];
           replacement_concept_id?: string | null;
           review_note?: string | null;
-          search_document?: never;
+          search_document?: unknown;
           slug?: string;
           synthesis_markdown?: string;
           target_mastery?: number | null;
@@ -413,6 +441,13 @@ export type Database = {
           },
           {
             foreignKeyName: "concepts_created_by_profile_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "concepts_created_by_profiles_id_fk";
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -448,6 +483,13 @@ export type Database = {
           },
           {
             foreignKeyName: "concepts_updated_by_profile_fk";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "concepts_updated_by_profiles_id_fk";
             columns: ["updated_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -532,6 +574,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "domains_created_by_profiles_id_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "domains_parent_domain_id_domains_id_fk";
             columns: ["parent_domain_id"];
             isOneToOne: false;
@@ -553,7 +602,281 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "domains_updated_by_profiles_id_fk";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "domains_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      learning_path_steps: {
+        Row: {
+          branch_key: string;
+          concept_id: string;
+          created_at: string;
+          exercise_markdown: string | null;
+          id: string;
+          learning_objective: string | null;
+          learning_path_id: string;
+          mandatory: boolean;
+          rationale: string | null;
+          required_prior_mastery: number;
+          step_order: number;
+          target_mastery: number;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          branch_key?: string;
+          concept_id: string;
+          created_at?: string;
+          exercise_markdown?: string | null;
+          id?: string;
+          learning_objective?: string | null;
+          learning_path_id: string;
+          mandatory?: boolean;
+          rationale?: string | null;
+          required_prior_mastery?: number;
+          step_order: number;
+          target_mastery: number;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          branch_key?: string;
+          concept_id?: string;
+          created_at?: string;
+          exercise_markdown?: string | null;
+          id?: string;
+          learning_objective?: string | null;
+          learning_path_id?: string;
+          mandatory?: boolean;
+          rationale?: string | null;
+          required_prior_mastery?: number;
+          step_order?: number;
+          target_mastery?: number;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "learning_path_steps_concept_workspace_fk";
+            columns: ["concept_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "learning_path_steps_path_workspace_fk";
+            columns: ["learning_path_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "learning_paths";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "learning_path_steps_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      learning_paths: {
+        Row: {
+          content_status: Database["public"]["Enums"]["content_status"];
+          created_at: string;
+          created_by: string;
+          id: string;
+          purpose_markdown: string;
+          slug: string;
+          target_outcome_markdown: string;
+          title: string;
+          updated_at: string;
+          updated_by: string;
+          workspace_id: string;
+        };
+        Insert: {
+          content_status?: Database["public"]["Enums"]["content_status"];
+          created_at?: string;
+          created_by: string;
+          id?: string;
+          purpose_markdown?: string;
+          slug: string;
+          target_outcome_markdown?: string;
+          title: string;
+          updated_at?: string;
+          updated_by: string;
+          workspace_id: string;
+        };
+        Update: {
+          content_status?: Database["public"]["Enums"]["content_status"];
+          created_at?: string;
+          created_by?: string;
+          id?: string;
+          purpose_markdown?: string;
+          slug?: string;
+          target_outcome_markdown?: string;
+          title?: string;
+          updated_at?: string;
+          updated_by?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "learning_paths_created_by_profiles_id_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "learning_paths_updated_by_profiles_id_fk";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "learning_paths_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      learning_prerequisite_waivers: {
+        Row: {
+          created_at: string;
+          id: string;
+          learning_path_id: string;
+          prerequisite_concept_id: string;
+          reason: string;
+          target_concept_id: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          learning_path_id: string;
+          prerequisite_concept_id: string;
+          reason: string;
+          target_concept_id: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          learning_path_id?: string;
+          prerequisite_concept_id?: string;
+          reason?: string;
+          target_concept_id?: string;
+          user_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "learning_prerequisite_waivers_user_id_profiles_id_fk";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "learning_prerequisite_waivers_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "learning_waivers_path_workspace_fk";
+            columns: ["learning_path_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "learning_paths";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "learning_waivers_prerequisite_workspace_fk";
+            columns: ["prerequisite_concept_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "learning_waivers_target_workspace_fk";
+            columns: ["target_concept_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id", "workspace_id"];
+          },
+        ];
+      };
+      mastery_evidence: {
+        Row: {
+          ai_assessment: Json | null;
+          artifact_url: string | null;
+          concept_id: string;
+          created_at: string;
+          evidence_type: Database["public"]["Enums"]["mastery_evidence_type"];
+          id: string;
+          level_claimed: number;
+          note: string | null;
+          user_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          ai_assessment?: Json | null;
+          artifact_url?: string | null;
+          concept_id: string;
+          created_at?: string;
+          evidence_type: Database["public"]["Enums"]["mastery_evidence_type"];
+          id?: string;
+          level_claimed: number;
+          note?: string | null;
+          user_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          ai_assessment?: Json | null;
+          artifact_url?: string | null;
+          concept_id?: string;
+          created_at?: string;
+          evidence_type?: Database["public"]["Enums"]["mastery_evidence_type"];
+          id?: string;
+          level_claimed?: number;
+          note?: string | null;
+          user_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "mastery_evidence_concept_workspace_fk";
+            columns: ["concept_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "mastery_evidence_user_id_profiles_id_fk";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "mastery_evidence_workspace_id_workspaces_id_fk";
             columns: ["workspace_id"];
             isOneToOne: false;
             referencedRelation: "workspaces";
@@ -650,6 +973,71 @@ export type Database = {
           },
         ];
       };
+      user_mastery: {
+        Row: {
+          concept_id: string;
+          current_level: number;
+          id: string;
+          last_evidence_id: string | null;
+          status: Database["public"]["Enums"]["mastery_status"];
+          target_level: number;
+          updated_at: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          concept_id: string;
+          current_level?: number;
+          id?: string;
+          last_evidence_id?: string | null;
+          status?: Database["public"]["Enums"]["mastery_status"];
+          target_level?: number;
+          updated_at?: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          concept_id?: string;
+          current_level?: number;
+          id?: string;
+          last_evidence_id?: string | null;
+          status?: Database["public"]["Enums"]["mastery_status"];
+          target_level?: number;
+          updated_at?: string;
+          user_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_mastery_concept_workspace_fk";
+            columns: ["concept_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "user_mastery_evidence_workspace_fk";
+            columns: ["last_evidence_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "mastery_evidence";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "user_mastery_user_id_profiles_id_fk";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_mastery_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       workspace_members: {
         Row: {
           created_at: string;
@@ -733,10 +1121,7 @@ export type Database = {
         Args: { p_name: string; p_seed?: Json; p_slug: string };
         Returns: string;
       };
-      concept_snapshot: {
-        Args: { p_concept_id: string };
-        Returns: Json;
-      };
+      concept_snapshot: { Args: { p_concept_id: string }; Returns: Json };
       create_atlas_concept: {
         Args: {
           p_change_summary: string;
@@ -761,12 +1146,16 @@ export type Database = {
           p_concept_id: string;
           p_depth?: number;
           p_node_cap?: number;
-          p_relation_keys?: string[] | null;
+          p_relation_keys?: string[];
           p_workspace_id: string;
         };
         Returns: Json;
       };
       install_atlas_seed: {
+        Args: { p_seed: Json; p_workspace_id: string };
+        Returns: Json;
+      };
+      install_learning_seed: {
         Args: { p_seed: Json; p_workspace_id: string };
         Returns: Json;
       };
@@ -788,15 +1177,22 @@ export type Database = {
         };
         Returns: string;
       };
-      shares_workspace_with: {
-        Args: { profile_uuid: string };
-        Returns: boolean;
+      remove_atlas_relation: {
+        Args: {
+          p_expected_updated_at: string;
+          p_relation_id: string;
+          p_workspace_id: string;
+        };
+        Returns: undefined;
+      };
+      replace_concept_aliases: {
+        Args: { p_aliases: Json; p_concept_id: string; p_workspace_id: string };
+        Returns: undefined;
       };
       search_concepts_lexical: {
         Args: {
-          p_content_statuses?:
-            Database["public"]["Enums"]["content_status"][] | null;
-          p_domain_ids?: string[] | null;
+          p_content_statuses?: Database["public"]["Enums"]["content_status"][];
+          p_domain_ids?: string[];
           p_limit?: number;
           p_query: string;
           p_workspace_id: string;
@@ -805,7 +1201,7 @@ export type Database = {
           alias_match: boolean;
           id: string;
           lexical_score: number;
-          matched_alias: string | null;
+          matched_alias: string;
           rank: number;
           text_match: boolean;
           title_match: boolean;
@@ -813,9 +1209,8 @@ export type Database = {
       };
       search_concepts_semantic: {
         Args: {
-          p_content_statuses?:
-            Database["public"]["Enums"]["content_status"][] | null;
-          p_domain_ids?: string[] | null;
+          p_content_statuses?: Database["public"]["Enums"]["content_status"][];
+          p_domain_ids?: string[];
           p_limit?: number;
           p_query_embedding: string;
           p_workspace_id: string;
@@ -835,21 +1230,19 @@ export type Database = {
         };
         Returns: undefined;
       };
-      remove_atlas_relation: {
+      set_learning_prerequisite_waiver: {
         Args: {
-          p_expected_updated_at: string;
-          p_relation_id: string;
+          p_learning_path_id: string;
+          p_prerequisite_concept_id: string;
+          p_reason: string;
+          p_target_concept_id: string;
           p_workspace_id: string;
         };
-        Returns: undefined;
+        Returns: string;
       };
-      replace_concept_aliases: {
-        Args: {
-          p_aliases: Json;
-          p_concept_id: string;
-          p_workspace_id: string;
-        };
-        Returns: undefined;
+      shares_workspace_with: {
+        Args: { profile_uuid: string };
+        Returns: boolean;
       };
       update_atlas_concept: {
         Args: {
@@ -874,6 +1267,23 @@ export type Database = {
         };
         Returns: Json;
       };
+      update_user_mastery: {
+        Args: {
+          p_artifact_url?: string;
+          p_concept_id: string;
+          p_current_level: number;
+          p_evidence_type: Database["public"]["Enums"]["mastery_evidence_type"];
+          p_note?: string;
+          p_status: Database["public"]["Enums"]["mastery_status"];
+          p_target_level: number;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      upsert_learning_path: {
+        Args: { p_path_id?: string; p_payload: Json; p_workspace_id: string };
+        Returns: string;
+      };
     };
     Enums: {
       alias_type:
@@ -894,6 +1304,16 @@ export type Database = {
       content_priority: "now" | "next" | "later" | "reference";
       content_status: "draft" | "reviewed" | "deprecated";
       domain_kind: "root" | "core" | "overlay";
+      mastery_evidence_type:
+        | "self_assessment"
+        | "explanation"
+        | "quiz"
+        | "applied_analysis"
+        | "design_artifact"
+        | "critique"
+        | "external_evaluation";
+      mastery_status:
+        "not_started" | "learning" | "applied" | "mastered" | "revisit";
       relation_category:
         | "hierarchy"
         | "learning"
@@ -1055,6 +1475,22 @@ export const Constants = {
       content_priority: ["now", "next", "later", "reference"],
       content_status: ["draft", "reviewed", "deprecated"],
       domain_kind: ["root", "core", "overlay"],
+      mastery_evidence_type: [
+        "self_assessment",
+        "explanation",
+        "quiz",
+        "applied_analysis",
+        "design_artifact",
+        "critique",
+        "external_evaluation",
+      ],
+      mastery_status: [
+        "not_started",
+        "learning",
+        "applied",
+        "mastered",
+        "revisit",
+      ],
       relation_category: [
         "hierarchy",
         "learning",

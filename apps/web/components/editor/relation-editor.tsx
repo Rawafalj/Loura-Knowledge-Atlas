@@ -55,7 +55,6 @@ export function RelationEditor({
   useEffect(() => {
     if (actionState.status !== "success" || !actionState.route) return;
     router.push(actionState.route);
-    router.refresh();
   }, [actionState, router]);
 
   return (
@@ -199,7 +198,6 @@ export function RemoveRelationForm({
   useEffect(() => {
     if (state.status !== "success" || !state.route) return;
     router.push(state.route);
-    router.refresh();
   }, [router, state]);
   return (
     <form action={action} className="danger-zone">

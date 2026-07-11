@@ -32,7 +32,7 @@ export function OnboardingForm() {
       />
       <label className="checkbox-row">
         <input name="installSeed" type="checkbox" defaultChecked />
-        Install the ten-area seed atlas skeleton
+        Install the ten-area atlas and curated first learning route
       </label>
       <button type="submit" disabled={pending}>
         {pending ? "Creating workspace…" : "Create private workspace"}

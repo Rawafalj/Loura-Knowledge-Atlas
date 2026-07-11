@@ -28,10 +28,12 @@ export async function searchAtlas(
   const supabase = await createSupabaseServerClient();
   const rpcScope = {
     p_workspace_id: workspaceId,
-    p_domain_ids: input.scope.domainIds.length ? input.scope.domainIds : null,
+    p_domain_ids: input.scope.domainIds.length
+      ? input.scope.domainIds
+      : undefined,
     p_content_statuses: input.scope.contentStatuses.length
       ? input.scope.contentStatuses
-      : null,
+      : undefined,
     p_limit: CANDIDATE_LIMIT,
   };
   const [lexicalResult, semanticResult] = await Promise.all([

@@ -23,7 +23,7 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    `Valid atlas seed: ${seed.domains.length} domains, ${seed.concepts.length} concepts, ${seed.relationTypes.length} relation types, ${seed.relations.length} relations`,
+    `Valid atlas seed: ${seed.domains.length} domains, ${seed.concepts.length} concepts, ${seed.relationTypes.length} relation types, ${seed.relations.length} relations, ${seed.paths.length} paths`,
   );
 }
 

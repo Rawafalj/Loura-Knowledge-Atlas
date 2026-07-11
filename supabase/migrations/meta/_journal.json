@@ -22,6 +22,13 @@
       "when": 1783706292853,
       "tag": "0003_milestone_3_search_graph",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783777983816,
+      "tag": "0004_milestone_4_learning_mastery",
+      "breakpoints": true
     }
   ]
 }

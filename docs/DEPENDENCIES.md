@@ -1,4 +1,4 @@
-# Dependency Inventory through Milestone 3
+# Dependency Inventory through Milestone 4
 
 Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockfiles.
 

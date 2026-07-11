@@ -16,7 +16,7 @@ export async function getConceptNeighborhood(
     p_concept_id: conceptId,
     p_depth: 2,
     p_node_cap: configuredGraphNodeCap(),
-    p_relation_keys: null,
+    p_relation_keys: undefined,
   });
   if (error) {
     throw new Error(`Unable to load concept graph: ${error.code}`);

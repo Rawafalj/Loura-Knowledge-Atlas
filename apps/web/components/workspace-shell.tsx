@@ -11,6 +11,7 @@ const primaryNavigation = [
   { href: "/atlas", label: "World map" },
   { href: "/atlas#domains", label: "Domains" },
   { href: "/atlas#concepts", label: "Concepts" },
+  { href: "/paths", label: "Learning paths" },
 ];
 
 export function WorkspaceShell({
@@ -45,8 +46,11 @@ export function WorkspaceShell({
               {item.label}
             </Link>
           ))}
+          <p className="nav-label">Learning</p>
+          <Link href="/mastery" className="nav-link">
+            Mastery
+          </Link>
           <p className="nav-label">Later milestones</p>
-          <span className="nav-link nav-link--disabled">Learning paths</span>
           <span className="nav-link nav-link--disabled">Sources</span>
           <span className="nav-link nav-link--disabled">Ask Atlas</span>
         </nav>

@@ -9,8 +9,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const databaseUrl = process.env.SUPABASE_DB_URL;
+const searchLatencyBudgetMs = Number(
+  process.env.SEARCH_E2E_LATENCY_BUDGET_MS ?? (process.env.CI ? 1_000 : 5_000),
+);
 
-test.describe("Milestones 2–3 atlas workflow", () => {
+test.describe("Milestones 2–4 atlas workflow", () => {
   let admin: SupabaseClient<Database>;
   let database: ReturnType<typeof postgres>;
   let ownerId: string | null = null;
@@ -122,10 +125,10 @@ test.describe("Milestones 2–3 atlas workflow", () => {
     await expect(
       page.getByRole("heading", { name: "Canonical hierarchy" }),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Create the first draft" }).click();
+    await page.goto("/concepts/new?domain=research-reasoning-measurement");
 
-    await page.getByLabel("Canonical name").fill("Feedback Control");
-    await page.getByLabel("Stable slug").fill("feedback-control");
+    await page.getByLabel("Canonical name").fill("Feedback Control Fixture");
+    await page.getByLabel("Stable slug").fill("feedback-control-fixture");
     await page
       .getByLabel("Concise definition")
       .fill("Regulation using observed outcomes.");
@@ -133,9 +136,9 @@ test.describe("Milestones 2–3 atlas workflow", () => {
       .getByLabel("Revision summary")
       .fill("Created feedback control draft");
     await page.getByRole("button", { name: "Create concept" }).click();
-    await expect(page).toHaveURL(/\/concepts\/feedback-control$/);
+    await expect(page).toHaveURL(/\/concepts\/feedback-control-fixture$/);
     await expect(
-      page.getByRole("heading", { name: "Feedback Control" }),
+      page.getByRole("heading", { name: "Feedback Control Fixture" }),
     ).toBeVisible();
 
     await page.getByRole("link", { name: "Edit concept" }).click();
@@ -150,7 +153,7 @@ test.describe("Milestones 2–3 atlas workflow", () => {
       .getByLabel("Revision summary")
       .fill("Clarified the feedback definition");
     await page.getByRole("button", { name: "Save concept revision" }).click();
-    await expect(page).toHaveURL(/\/concepts\/feedback-control$/);
+    await expect(page).toHaveURL(/\/concepts\/feedback-control-fixture$/);
     await page.getByRole("link", { name: "History" }).click();
     await expect(page.getByText("Revision 2")).toBeVisible();
 
@@ -159,28 +162,37 @@ test.describe("Milestones 2–3 atlas workflow", () => {
       name: "Search concepts and sources",
     });
     await expect(searchInput).toBeFocused();
+    const searchResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().endsWith("/api/search") &&
+        response.request().method() === "POST",
+    );
     const searchStartedAt = Date.now();
     await searchInput.fill("closed-loop regulator");
+    const searchResponse = await searchResponsePromise;
+    expect(searchResponse.ok()).toBe(true);
+    expect(Date.now() - searchStartedAt).toBeLessThan(searchLatencyBudgetMs);
     const searchResult = page.getByRole("option", {
-      name: /Feedback Control/,
+      name: /Feedback Control Fixture/,
     });
     await expect(searchResult).toContainText(
       "Matched alias: Closed-loop regulator",
     );
-    expect(Date.now() - searchStartedAt).toBeLessThan(1_000);
     await expect(searchResult).toContainText("alias");
     await searchInput.press("Enter");
-    await expect(page).toHaveURL(/\/concepts\/feedback-control$/);
+    await expect(page).toHaveURL(/\/concepts\/feedback-control-fixture$/);
 
     await page.goto("/concepts/new?domain=research-reasoning-measurement");
-    await page.getByLabel("Canonical name").fill("Observation");
-    await page.getByLabel("Stable slug").fill("observation");
+    await page.getByLabel("Canonical name").fill("Test Observation");
+    await page.getByLabel("Stable slug").fill("test-observation");
     await page
       .getByLabel("Concise definition")
       .fill("A recorded view of a system condition.");
-    await page.getByLabel("Revision summary").fill("Created observation draft");
+    await page
+      .getByLabel("Revision summary")
+      .fill("Created test-observation draft");
     await page.getByRole("button", { name: "Create concept" }).click();
-    await expect(page).toHaveURL(/\/concepts\/observation$/);
+    await expect(page).toHaveURL(/\/concepts\/test-observation$/);
 
     await page.getByRole("link", { name: "Add relation" }).click();
     await page
@@ -188,13 +200,19 @@ test.describe("Milestones 2–3 atlas workflow", () => {
       .selectOption({ label: "prerequisite for · learning" });
     await page
       .getByLabel("Target concept")
-      .selectOption({ label: "Feedback Control" });
+      .selectOption({ label: "Feedback Control Fixture" });
     await page
       .getByLabel("Qualification")
-      .fill("Observation is required before feedback can regulate outcomes.");
+      .fill(
+        "Test Observation is required before feedback can regulate outcomes.",
+      );
     await page.getByRole("button", { name: "Add relationship" }).click();
-    await expect(page).toHaveURL(/\/concepts\/observation\?tab=relationships$/);
-    await expect(page.getByRole("table")).toContainText("Feedback Control");
+    await expect(page).toHaveURL(
+      /\/concepts\/test-observation\?tab=relationships$/,
+    );
+    await expect(page.getByRole("table")).toContainText(
+      "Feedback Control Fixture",
+    );
     await expect(page.getByRole("table")).toContainText("prerequisite for");
     await expect(page.getByLabel("Local concept graph")).toBeVisible();
     await page.getByLabel("Expansion depth").selectOption("2");
@@ -204,9 +222,74 @@ test.describe("Milestones 2–3 atlas workflow", () => {
     const graphList = page.getByRole("table", {
       name: /visible relationships represented in the local graph/,
     });
-    await expect(graphList).toContainText("Feedback Control");
+    await expect(graphList).toContainText("Feedback Control Fixture");
     await expect(graphList).toContainText("prerequisite_for");
 
+    const [systemBoundary] = await database<{ id: string }[]>`
+      select id from public.concepts
+      where workspace_id = ${workspaceId} and slug = 'system-boundary'
+    `;
+    if (!systemBoundary) throw new Error("Seed learning concept is missing");
+    const [beforePathView] = await database<{ count: number }[]>`
+      select count(*)::integer as count from public.user_mastery
+      where workspace_id = ${workspaceId} and user_id = ${ownerId}
+    `;
+    await page.goto("/paths/closed-loop-operational-execution");
+    await expect(
+      page.getByRole("heading", { name: "Closed-loop operational execution" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Next ready", { exact: true }).locator(".."),
+    ).toContainText("System and Boundary");
+    const firstLearningStep = page.locator("li.learning-step").filter({
+      has: page.getByRole("heading", {
+        name: "System and Boundary",
+        exact: true,
+      }),
+    });
+    const secondLearningStep = page.locator("li.learning-step").filter({
+      has: page.getByRole("heading", { name: "Desired State", exact: true }),
+    });
+    await expect(firstLearningStep).toContainText("ready");
+    await expect(secondLearningStep).toContainText("blocked");
+    const [afterPathView] = await database<{ count: number }[]>`
+      select count(*)::integer as count from public.user_mastery
+      where workspace_id = ${workspaceId} and user_id = ${ownerId}
+    `;
+    expect(afterPathView?.count).toBe(beforePathView?.count);
+
+    await firstLearningStep.getByText("Add mastery evidence").click();
+    await firstLearningStep.getByLabel("Current level").selectOption("2");
+    await firstLearningStep.getByLabel("Target level").selectOption("2");
+    await firstLearningStep
+      .getByLabel("Learning status")
+      .selectOption("mastered");
+    await firstLearningStep
+      .getByLabel("Evidence type")
+      .selectOption("applied_analysis");
+    await firstLearningStep
+      .getByLabel("Evidence note")
+      .fill("Applied a boundary to the service-backed exception fixture.");
+    await firstLearningStep
+      .getByRole("button", { name: "Save evidence and mastery" })
+      .click();
+    await expect(page).toHaveURL(
+      /\/paths\/closed-loop-operational-execution\?saved=mastery$/,
+    );
+    await expect(
+      page.getByText("Next ready", { exact: true }).locator(".."),
+    ).toContainText("Desired State");
+    await expect(
+      page.locator("li.learning-step").filter({
+        has: page.getByRole("heading", { name: "Desired State", exact: true }),
+      }),
+    ).toContainText("ready");
+    await page.goto("/mastery");
+    await expect(
+      page.getByRole("row").filter({ hasText: "System and Boundary" }),
+    ).toContainText("applied analysis");
+
+    await page.goto("/concepts/test-observation");
     await page.getByRole("link", { name: "Edit concept" }).click();
     await page.getByLabel("Content status").selectOption("deprecated");
     await page
@@ -283,8 +366,44 @@ test.describe("Milestones 2–3 atlas workflow", () => {
     await expect(
       viewerPage.getByRole("link", { name: "Create concept draft" }),
     ).toHaveCount(0);
-    await viewerPage.goto("/concepts/observation/edit");
-    await expect(viewerPage).toHaveURL(/\/concepts\/observation$/);
+    await viewerPage.goto("/concepts/test-observation/edit");
+    await expect(viewerPage).toHaveURL(/\/concepts\/test-observation$/);
+    await viewerPage.goto("/paths/closed-loop-operational-execution");
+    await expect(
+      viewerPage.getByRole("link", { name: "Edit path" }),
+    ).toHaveCount(0);
+    const viewerFirstStep = viewerPage.locator("li.learning-step").filter({
+      has: viewerPage.getByRole("heading", {
+        name: "System and Boundary",
+        exact: true,
+      }),
+    });
+    await viewerFirstStep.getByText("Add mastery evidence").click();
+    await viewerFirstStep.getByLabel("Current level").selectOption("1");
+    await viewerFirstStep.getByLabel("Target level").selectOption("2");
+    await viewerFirstStep
+      .getByLabel("Learning status")
+      .selectOption("learning");
+    await viewerFirstStep
+      .getByLabel("Evidence note")
+      .fill("Viewer explained the boundary in their own words.");
+    await viewerFirstStep
+      .getByRole("button", { name: "Save evidence and mastery" })
+      .click();
+    await expect(viewerPage).toHaveURL(/\?saved=mastery$/);
+    const [viewerMastery] = await database<
+      { current_level: number; evidence_count: number }[]
+    >`
+      select mastery.current_level,
+        (select count(*)::integer from public.mastery_evidence evidence
+         where evidence.user_id = ${viewerId} and evidence.concept_id = ${systemBoundary.id}) as evidence_count
+      from public.user_mastery mastery
+      where mastery.user_id = ${viewerId} and mastery.concept_id = ${systemBoundary.id}
+    `;
+    expect(viewerMastery).toMatchObject({
+      current_level: 1,
+      evidence_count: 1,
+    });
     await viewerContext.close();
   });
 });

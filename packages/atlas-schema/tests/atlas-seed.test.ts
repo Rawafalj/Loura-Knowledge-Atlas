@@ -59,9 +59,11 @@ const base = () => ({
 });
 
 describe("atlas seed validation", () => {
-  it("accepts the ten-area default skeleton", () => {
+  it("accepts the ten-area skeleton and curated first route", () => {
     expect(defaultSeedSkeleton.domains).toHaveLength(10);
     expect(defaultSeedSkeleton.relationTypes).toHaveLength(20);
+    expect(defaultSeedSkeleton.concepts).toHaveLength(15);
+    expect(defaultSeedSkeleton.paths[0]?.steps).toHaveLength(15);
   });
 
   it("rejects duplicate slugs", () => {
@@ -95,6 +97,29 @@ describe("atlas seed validation", () => {
       { source: "two", type: "prerequisite_for", target: "one" },
     ];
     expect(() => atlasSeedSchema.parse(seed)).toThrow(/Acyclic relation cycle/);
+  });
+
+  it("rejects a path that places a prerequisite after its target", () => {
+    const seed = base();
+    seed.concepts = [concept("one"), concept("two")];
+    seed.relations = [
+      { source: "one", type: "prerequisite_for", target: "two" },
+    ];
+    expect(() =>
+      atlasSeedSchema.parse({
+        ...seed,
+        paths: [
+          {
+            slug: "invalid-route",
+            title: "Invalid route",
+            steps: [
+              { concept: "two", order: 1, targetMastery: 1 },
+              { concept: "one", order: 2, targetMastery: 1 },
+            ],
+          },
+        ],
+      }),
+    ).toThrow(/places prerequisite one after two/);
   });
 
   it("normalizes symmetric endpoints", () => {

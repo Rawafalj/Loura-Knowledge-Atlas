@@ -205,5 +205,302 @@ relationTypes:
       symmetric: true,
     }
 
-concepts: []
-relations: []
+concepts:
+  - slug: system-boundary
+    canonicalName: System and Boundary
+    domain: systems-control-decision
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: A chosen distinction between the system being reasoned about and its surrounding environment.
+  - slug: desired-state
+    canonicalName: Desired State
+    domain: systems-engineering-deployment
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: An observable condition the system is intended to reach or maintain.
+  - slug: state-transition
+    canonicalName: State Transition
+    domain: information-data-knowledge
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: A permitted change from one represented system state to another.
+  - slug: observation
+    canonicalName: Observation and Uncertainty
+    domain: research-reasoning-measurement
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: A measurement-informed view of system conditions whose limits and uncertainty remain explicit.
+  - slug: feedback-control
+    canonicalName: Feedback Control
+    domain: systems-control-decision
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: Regulation that compares observed outcomes with a desired state and adjusts action.
+    aliases:
+      - value: Closed-loop regulation
+        type: synonym
+  - slug: decision-policy-plan
+    canonicalName: Decision, Policy, and Plan
+    domain: ai-reasoning-agents
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: Distinct mechanisms for selecting an outcome, constraining choices, and organizing intended action.
+  - slug: authority-commitment
+    canonicalName: Authority, Responsibility, and Commitment
+    domain: organizations-coordination-work
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: The allocation of decision rights, accountable obligations, and explicit promises to act.
+  - slug: workflow-coordination
+    canonicalName: Workflow, Dependency, and Coordination
+    domain: organizations-coordination-work
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: The organization of dependent work, handoffs, blocked states, and changed conditions across actors.
+  - slug: bounded-autonomy
+    canonicalName: Agent, Tool Use, and Bounded Autonomy
+    domain: ai-reasoning-agents
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: Delegated computational action constrained by permissions, authority, and explicit intervention boundaries.
+  - slug: idempotency
+    canonicalName: Partial Failure, Retry, and Idempotency
+    domain: software-distributed-integration
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: Action semantics that remain safe when execution is uncertain and attempts may be repeated.
+  - slug: provenance-traceability
+    canonicalName: Evidence, Provenance, and Traceability
+    domain: information-data-knowledge
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: The evidence and origin chain connecting assertions, actions, transformations, and outcomes.
+  - slug: verification-validation
+    canonicalName: Verification, Validation, and Closure
+    domain: systems-engineering-deployment
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: Distinct checks that work occurred, the intended outcome was achieved, and closure is justified.
+  - slug: human-control
+    canonicalName: Escalation, Override, and Human Control
+    domain: human-ai-safety-governance
+    status: draft
+    priority: now
+    targetMastery: 3
+    conciseDefinition: Mechanisms that preserve appropriate human authority through intervention, escalation, and override.
+  - slug: operational-learning
+    canonicalName: Learning, Adaptation, and Operational Memory
+    domain: organizations-coordination-work
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: Disciplined updating of records, expectations, models, and policy after operational outcomes.
+  - slug: industrial-integration
+    canonicalName: Industrial Application and Integration
+    domain: manufacturing-industrial-operations
+    status: draft
+    priority: now
+    targetMastery: 2
+    conciseDefinition: Applying an operational loop across industrial systems, authority boundaries, and evidence sources.
+
+relations:
+  - {
+      source: system-boundary,
+      type: prerequisite_for,
+      target: desired-state,
+      status: reviewed,
+    }
+  - {
+      source: desired-state,
+      type: prerequisite_for,
+      target: state-transition,
+      status: reviewed,
+    }
+  - {
+      source: state-transition,
+      type: prerequisite_for,
+      target: observation,
+      status: reviewed,
+    }
+  - {
+      source: observation,
+      type: prerequisite_for,
+      target: feedback-control,
+      status: reviewed,
+    }
+  - {
+      source: feedback-control,
+      type: prerequisite_for,
+      target: decision-policy-plan,
+      status: reviewed,
+    }
+  - {
+      source: decision-policy-plan,
+      type: prerequisite_for,
+      target: authority-commitment,
+      status: reviewed,
+    }
+  - {
+      source: authority-commitment,
+      type: prerequisite_for,
+      target: workflow-coordination,
+      status: reviewed,
+    }
+  - {
+      source: workflow-coordination,
+      type: prerequisite_for,
+      target: bounded-autonomy,
+      status: reviewed,
+    }
+  - {
+      source: bounded-autonomy,
+      type: prerequisite_for,
+      target: idempotency,
+      status: reviewed,
+    }
+  - {
+      source: idempotency,
+      type: prerequisite_for,
+      target: provenance-traceability,
+      status: reviewed,
+    }
+  - {
+      source: provenance-traceability,
+      type: prerequisite_for,
+      target: verification-validation,
+      status: reviewed,
+    }
+  - {
+      source: verification-validation,
+      type: prerequisite_for,
+      target: human-control,
+      status: reviewed,
+    }
+  - {
+      source: human-control,
+      type: prerequisite_for,
+      target: operational-learning,
+      status: reviewed,
+    }
+  - {
+      source: operational-learning,
+      type: prerequisite_for,
+      target: industrial-integration,
+      status: reviewed,
+    }
+
+paths:
+  - slug: closed-loop-operational-execution
+    title: Closed-loop operational execution
+    status: reviewed
+    purposeMarkdown: >-
+      Develop the conceptual foundation for systems that detect operational gaps,
+      coordinate action, act through unreliable systems, collect evidence, validate
+      outcomes, and learn.
+    targetOutcomeMarkdown: >-
+      Design and critique a closed-loop operational execution architecture for
+      Loura with explicit state, observation, decisions, commitments, action
+      semantics, evidence, human authority, and validation.
+    steps:
+      - concept: system-boundary
+        order: 1
+        targetMastery: 2
+        rationale: Establish what is inside the operational problem and what crosses its boundary.
+        learningObjective: Choose a defensible system boundary and identify actors, resources, and interfaces.
+        exerciseMarkdown: Define one Loura operational exception and state what is inside, outside, and crossing its boundary.
+      - concept: desired-state
+        order: 2
+        targetMastery: 2
+        rationale: A loop needs an observable outcome against which current conditions can be compared.
+        learningObjective: Express goals as desired state, constraints, and acceptance criteria.
+        exerciseMarkdown: Rewrite “resolve the issue” as desired state, constraints, and acceptance criteria.
+      - concept: state-transition
+        order: 3
+        targetMastery: 3
+        rationale: Operational execution must represent current conditions and permitted change.
+        learningObjective: Distinguish state from events and model valid lifecycle transitions.
+        exerciseMarkdown: Create a state machine for an exception from detection through closure and reopening.
+      - concept: observation
+        order: 4
+        targetMastery: 2
+        rationale: Decisions act on observed or estimated state rather than reality directly.
+        learningObjective: Identify noise, latency, missing data, and confidence limits.
+        exerciseMarkdown: List evidence sources and state what each can and cannot establish.
+      - concept: feedback-control
+        order: 5
+        targetMastery: 2
+        rationale: Feedback connects observed gaps to corrective action.
+        learningObjective: Map controller, process, sensor, actuator, disturbance, and delay.
+        exerciseMarkdown: Model the exception as a feedback loop and identify destabilizing delays.
+      - concept: decision-policy-plan
+        order: 6
+        targetMastery: 2
+        rationale: The loop needs explicit selection, constraint, planning, and replanning semantics.
+        learningObjective: Distinguish decision, policy, plan, and action under uncertainty.
+        exerciseMarkdown: Identify which decisions can be policy-driven and which require contextual judgment.
+      - concept: authority-commitment
+        order: 7
+        targetMastery: 3
+        rationale: Selected action still requires legitimate authority and accountable ownership.
+        learningObjective: Define human and agent decision rights, obligations, and escalation boundaries.
+        exerciseMarkdown: Create a responsibility and authority model for the exception.
+      - concept: workflow-coordination
+        order: 8
+        targetMastery: 3
+        rationale: Multi-actor action introduces dependencies, handoffs, and blocked work.
+        learningObjective: Model dependent, parallel, and exception-driven work.
+        exerciseMarkdown: Model a resolution flow with dependencies, blocked work, and changed conditions.
+      - concept: bounded-autonomy
+        order: 9
+        targetMastery: 3
+        rationale: Agent action must stay within tool and authority boundaries.
+        learningObjective: Allocate observe, recommend, approve, execute, verify, and escalate responsibilities.
+        exerciseMarkdown: Classify each workflow step and assign human or agent responsibility.
+      - concept: idempotency
+        order: 10
+        targetMastery: 3
+        rationale: External action is vulnerable to timeout, ambiguity, and repeated attempts.
+        learningObjective: Design retry-safe or compensatable action protocols.
+        exerciseMarkdown: Define operation ID, status check, retry, deduplication, and compensation for an uncertain command.
+      - concept: provenance-traceability
+        order: 11
+        targetMastery: 3
+        rationale: Closure requires a trustworthy chain from action to evidence and outcome.
+        learningObjective: Preserve origin, transformation history, and traceability.
+        exerciseMarkdown: Define the evidence package required to close the exception.
+      - concept: verification-validation
+        order: 12
+        targetMastery: 3
+        rationale: Work completion and problem resolution are different claims.
+        learningObjective: Distinguish verification, validation, acceptance, and reopening.
+        exerciseMarkdown: Specify what proves work occurred and what proves the operational problem is resolved.
+      - concept: human-control
+        order: 13
+        targetMastery: 3
+        rationale: Risk and uncertainty require explicit intervention and override paths.
+        learningObjective: Define escalation triggers using confidence, risk, authority, and time.
+        exerciseMarkdown: Define escalation triggers and the context that must accompany them.
+      - concept: operational-learning
+        order: 14
+        targetMastery: 2
+        rationale: Outcomes should improve memory and policy without overgeneralizing one incident.
+        learningObjective: Separate event history from justified reusable learning.
+        exerciseMarkdown: Specify incident facts, reusable knowledge, policy changes, and unresolved uncertainty to retain.
+      - concept: industrial-integration
+        order: 15
+        targetMastery: 2
+        rationale: The complete loop must cross real industrial and enterprise boundaries.
+        learningObjective: Map systems of record, systems of action, safety, and operational technology constraints.
+        exerciseMarkdown: Map the loop across ERP, MES, CMMS, SCADA, and human communication interfaces.

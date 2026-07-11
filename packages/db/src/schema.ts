@@ -79,6 +79,22 @@ export const auditActorType = pgEnum("audit_actor_type", [
   "worker",
   "system",
 ]);
+export const masteryStatus = pgEnum("mastery_status", [
+  "not_started",
+  "learning",
+  "applied",
+  "mastered",
+  "revisit",
+]);
+export const masteryEvidenceType = pgEnum("mastery_evidence_type", [
+  "self_assessment",
+  "explanation",
+  "quiz",
+  "applied_analysis",
+  "design_artifact",
+  "critique",
+  "external_evaluation",
+]);
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -494,6 +510,263 @@ export const auditEvents = pgTable(
     index("audit_events_workspace_created_idx").on(
       table.workspaceId,
       table.createdAt,
+    ),
+  ],
+);
+
+export const learningPaths = pgTable(
+  "learning_paths",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    purposeMarkdown: text("purpose_markdown").notNull().default(""),
+    targetOutcomeMarkdown: text("target_outcome_markdown")
+      .notNull()
+      .default(""),
+    contentStatus: contentStatus("content_status").notNull().default("draft"),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => profiles.id),
+    updatedBy: uuid("updated_by")
+      .notNull()
+      .references(() => profiles.id),
+    ...timestamps,
+  },
+  (table) => [
+    unique("learning_paths_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    unique("learning_paths_workspace_slug_unique").on(
+      table.workspaceId,
+      table.slug,
+    ),
+    index("learning_paths_workspace_status_idx").on(
+      table.workspaceId,
+      table.contentStatus,
+    ),
+  ],
+);
+
+export const learningPathSteps = pgTable(
+  "learning_path_steps",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    learningPathId: uuid("learning_path_id").notNull(),
+    conceptId: uuid("concept_id").notNull(),
+    stepOrder: integer("step_order").notNull(),
+    branchKey: text("branch_key").notNull().default("main"),
+    mandatory: boolean("mandatory").notNull().default(true),
+    rationale: text("rationale"),
+    learningObjective: text("learning_objective"),
+    targetMastery: smallint("target_mastery").notNull(),
+    requiredPriorMastery: smallint("required_prior_mastery")
+      .notNull()
+      .default(1),
+    exerciseMarkdown: text("exercise_markdown"),
+    ...timestamps,
+  },
+  (table) => [
+    unique("learning_path_steps_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    foreignKey({
+      name: "learning_path_steps_path_workspace_fk",
+      columns: [table.learningPathId, table.workspaceId],
+      foreignColumns: [learningPaths.id, learningPaths.workspaceId],
+    }).onDelete("cascade"),
+    foreignKey({
+      name: "learning_path_steps_concept_workspace_fk",
+      columns: [table.conceptId, table.workspaceId],
+      foreignColumns: [concepts.id, concepts.workspaceId],
+    }),
+    unique("learning_path_steps_order_unique").on(
+      table.learningPathId,
+      table.branchKey,
+      table.stepOrder,
+    ),
+    unique("learning_path_steps_concept_unique").on(
+      table.learningPathId,
+      table.branchKey,
+      table.conceptId,
+    ),
+    index("learning_path_steps_path_order_idx").on(
+      table.workspaceId,
+      table.learningPathId,
+      table.branchKey,
+      table.stepOrder,
+    ),
+    check("learning_path_steps_order_check", sql`${table.stepOrder} > 0`),
+    check(
+      "learning_path_steps_target_mastery_check",
+      sql`${table.targetMastery} between 0 and 5`,
+    ),
+    check(
+      "learning_path_steps_prior_mastery_check",
+      sql`${table.requiredPriorMastery} between 0 and 5`,
+    ),
+  ],
+);
+
+export const masteryEvidence = pgTable(
+  "mastery_evidence",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    conceptId: uuid("concept_id").notNull(),
+    levelClaimed: smallint("level_claimed").notNull(),
+    evidenceType: masteryEvidenceType("evidence_type").notNull(),
+    note: text("note"),
+    artifactUrl: text("artifact_url"),
+    aiAssessment: jsonb("ai_assessment"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("mastery_evidence_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    foreignKey({
+      name: "mastery_evidence_concept_workspace_fk",
+      columns: [table.conceptId, table.workspaceId],
+      foreignColumns: [concepts.id, concepts.workspaceId],
+    }),
+    index("mastery_evidence_user_concept_idx").on(
+      table.workspaceId,
+      table.userId,
+      table.conceptId,
+      table.createdAt,
+    ),
+    check(
+      "mastery_evidence_level_check",
+      sql`${table.levelClaimed} between 0 and 5`,
+    ),
+    check(
+      "mastery_evidence_content_check",
+      sql`${table.note} is not null or ${table.artifactUrl} is not null`,
+    ),
+  ],
+);
+
+export const userMastery = pgTable(
+  "user_mastery",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    conceptId: uuid("concept_id").notNull(),
+    currentLevel: smallint("current_level").notNull().default(0),
+    targetLevel: smallint("target_level").notNull().default(1),
+    status: masteryStatus("status").notNull().default("not_started"),
+    lastEvidenceId: uuid("last_evidence_id"),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "user_mastery_concept_workspace_fk",
+      columns: [table.conceptId, table.workspaceId],
+      foreignColumns: [concepts.id, concepts.workspaceId],
+    }),
+    foreignKey({
+      name: "user_mastery_evidence_workspace_fk",
+      columns: [table.lastEvidenceId, table.workspaceId],
+      foreignColumns: [masteryEvidence.id, masteryEvidence.workspaceId],
+    }),
+    unique("user_mastery_workspace_user_concept_unique").on(
+      table.workspaceId,
+      table.userId,
+      table.conceptId,
+    ),
+    index("user_mastery_user_status_idx").on(
+      table.workspaceId,
+      table.userId,
+      table.status,
+    ),
+    check(
+      "user_mastery_current_level_check",
+      sql`${table.currentLevel} between 0 and 5`,
+    ),
+    check(
+      "user_mastery_target_level_check",
+      sql`${table.targetLevel} between 0 and 5`,
+    ),
+  ],
+);
+
+export const learningPrerequisiteWaivers = pgTable(
+  "learning_prerequisite_waivers",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    learningPathId: uuid("learning_path_id").notNull(),
+    targetConceptId: uuid("target_concept_id").notNull(),
+    prerequisiteConceptId: uuid("prerequisite_concept_id").notNull(),
+    reason: text("reason").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "learning_waivers_path_workspace_fk",
+      columns: [table.learningPathId, table.workspaceId],
+      foreignColumns: [learningPaths.id, learningPaths.workspaceId],
+    }).onDelete("cascade"),
+    foreignKey({
+      name: "learning_waivers_target_workspace_fk",
+      columns: [table.targetConceptId, table.workspaceId],
+      foreignColumns: [concepts.id, concepts.workspaceId],
+    }),
+    foreignKey({
+      name: "learning_waivers_prerequisite_workspace_fk",
+      columns: [table.prerequisiteConceptId, table.workspaceId],
+      foreignColumns: [concepts.id, concepts.workspaceId],
+    }),
+    unique("learning_waivers_unique").on(
+      table.workspaceId,
+      table.userId,
+      table.learningPathId,
+      table.targetConceptId,
+      table.prerequisiteConceptId,
+    ),
+    index("learning_waivers_user_path_idx").on(
+      table.workspaceId,
+      table.userId,
+      table.learningPathId,
+    ),
+    check(
+      "learning_waivers_reason_check",
+      sql`length(trim(${table.reason})) >= 3`,
+    ),
+    check(
+      "learning_waivers_distinct_concepts_check",
+      sql`${table.targetConceptId} <> ${table.prerequisiteConceptId}`,
     ),
   ],
 );
