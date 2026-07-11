@@ -10,7 +10,7 @@ ALTER TABLE "concepts" ADD COLUMN "search_document" "tsvector" GENERATED ALWAYS 
             coalesce("failure_modes_markdown", '') || ' ' ||
             coalesce("common_confusions_markdown", '')
           ), 'C')) STORED;--> statement-breakpoint
-ALTER TABLE "concepts" ADD COLUMN "embedding" vector(1536);--> statement-breakpoint
+ALTER TABLE "concepts" ADD COLUMN "embedding" extensions.vector(1536);--> statement-breakpoint
 ALTER TABLE "concepts" ADD COLUMN "embedding_model" text;--> statement-breakpoint
 ALTER TABLE "concepts" ADD COLUMN "embedding_updated_at" timestamp with time zone;--> statement-breakpoint
 CREATE INDEX "concepts_search_document_idx" ON "concepts" USING gin ("search_document");--> statement-breakpoint
@@ -100,7 +100,7 @@ $$;--> statement-breakpoint
 
 CREATE OR REPLACE FUNCTION public.search_concepts_semantic(
   p_workspace_id uuid,
-  p_query_embedding vector(1536),
+  p_query_embedding extensions.vector(1536),
   p_domain_ids uuid[] DEFAULT NULL,
   p_content_statuses public.content_status[] DEFAULT NULL,
   p_limit integer DEFAULT 30
@@ -134,7 +134,7 @@ $$;--> statement-breakpoint
 CREATE OR REPLACE FUNCTION public.set_concept_embedding(
   p_workspace_id uuid,
   p_concept_id uuid,
-  p_embedding vector(1536),
+  p_embedding extensions.vector(1536),
   p_embedding_model text
 )
 RETURNS void
@@ -320,16 +320,16 @@ GRANT EXECUTE ON FUNCTION public.search_concepts_lexical(
   uuid, text, uuid[], public.content_status[], integer
 ) TO authenticated;--> statement-breakpoint
 REVOKE ALL ON FUNCTION public.search_concepts_semantic(
-  uuid, vector, uuid[], public.content_status[], integer
+  uuid, extensions.vector, uuid[], public.content_status[], integer
 ) FROM PUBLIC;--> statement-breakpoint
 GRANT EXECUTE ON FUNCTION public.search_concepts_semantic(
-  uuid, vector, uuid[], public.content_status[], integer
+  uuid, extensions.vector, uuid[], public.content_status[], integer
 ) TO authenticated;--> statement-breakpoint
 REVOKE ALL ON FUNCTION public.set_concept_embedding(
-  uuid, uuid, vector, text
+  uuid, uuid, extensions.vector, text
 ) FROM PUBLIC;--> statement-breakpoint
 GRANT EXECUTE ON FUNCTION public.set_concept_embedding(
-  uuid, uuid, vector, text
+  uuid, uuid, extensions.vector, text
 ) TO authenticated;--> statement-breakpoint
 REVOKE ALL ON FUNCTION public.get_concept_neighborhood(
   uuid, uuid, integer, integer, text[]
