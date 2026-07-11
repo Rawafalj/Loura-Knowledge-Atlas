@@ -1,6 +1,6 @@
 # Milestone 5 Handoff — Source Library and Deterministic Ingestion
 
-**Status:** Complete locally. GitHub Actions evidence is recorded after the milestone commit.
+**Status:** Complete locally and in GitHub Actions.
 
 ## Delivered
 
@@ -22,6 +22,7 @@
 - Parser fixtures passed for authored PDF, DOCX, PPTX, Markdown, and HTML inputs. URL tests cover private destinations, unsafe redirects, and validated-IP pinning.
 - `pnpm db:generate` reported no schema drift after the reviewed migration was generated.
 - In-app browser smoke validation found a semantic login boundary and no browser warnings or errors; the authenticated source flow is covered by the service-backed Chromium suite.
+- [GitHub Actions run 29160454299](https://github.com/Rawafalj/Loura-Knowledge-Atlas/actions/runs/29160454299) — verify, database/service-E2E, secret scanning, and production dependency audit all passed for milestone commit `8651851`.
 
 ## Migration
 
