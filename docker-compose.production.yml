@@ -4,14 +4,11 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     restart: unless-stopped
+    env_file:
+      - .env.production
     environment:
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
-      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-      AI_PROVIDER: ${AI_PROVIDER:-mock}
-      GRAPH_VISIBLE_NODE_CAP: ${GRAPH_VISIBLE_NODE_CAP:-100}
-      ASK_MAX_CONTEXT_TOKENS: ${ASK_MAX_CONTEXT_TOKENS:-16000}
-      PRODUCT_ANALYTICS_ENABLED: ${PRODUCT_ANALYTICS_ENABLED:-false}
+      SUPABASE_SERVICE_ROLE_KEY: ""
+      DATABASE_URL: ""
     ports:
       - "3000:3000"
     depends_on:
