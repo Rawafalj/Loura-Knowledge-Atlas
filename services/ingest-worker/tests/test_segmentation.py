@@ -47,7 +47,7 @@ def test_long_blocks_split_below_the_token_cap() -> None:
 
 def test_segment_ids_are_stable_within_a_source_version() -> None:
     version_id = UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-    stable_key = "0123456789abcdef0123456789abcdef"
+    stable_key = "segment-key-fixture"
 
     assert stable_segment_id(version_id, stable_key) == stable_segment_id(
         version_id, stable_key
