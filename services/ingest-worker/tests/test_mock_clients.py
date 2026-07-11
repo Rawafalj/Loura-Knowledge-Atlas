@@ -18,4 +18,3 @@ def test_embedding_mock_is_deterministic() -> None:
 
     assert client.embed(["atlas"]) == client.embed(["atlas"])
     assert len(client.embed(["atlas"])[0]) == 4
-

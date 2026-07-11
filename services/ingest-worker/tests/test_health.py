@@ -18,10 +18,10 @@ def test_health_endpoint_requires_no_external_services() -> None:
             assert json.load(response) == {
                 "service": "ingest-worker",
                 "status": "ok",
-                "milestone": 0,
+                "milestone": 5,
+                "processingConfigured": False,
             }
     finally:
         server.shutdown()
         server.server_close()
         thread.join(timeout=2)
-

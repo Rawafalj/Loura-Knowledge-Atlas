@@ -36,22 +36,51 @@ export async function searchAtlas(
       : undefined,
     p_limit: CANDIDATE_LIMIT,
   };
-  const [lexicalResult, semanticResult] = await Promise.all([
-    supabase.rpc("search_concepts_lexical", {
-      ...rpcScope,
-      p_query: input.query,
-    }),
-    supabase.rpc("search_concepts_semantic", {
-      ...rpcScope,
-      p_query_embedding: vectorToLiteral(queryEmbedding, profile.dimensions),
-    }),
-  ]);
+  const [lexicalResult, semanticResult, sourceLexicalResult] =
+    await Promise.all([
+      supabase.rpc("search_concepts_lexical", {
+        ...rpcScope,
+        p_query: input.query,
+      }),
+      supabase.rpc("search_concepts_semantic", {
+        ...rpcScope,
+        p_query_embedding: vectorToLiteral(queryEmbedding, profile.dimensions),
+      }),
+      supabase.rpc("search_source_segments_lexical", {
+        p_workspace_id: workspaceId,
+        p_query: input.query,
+        p_source_types: input.scope.sourceTypes.length
+          ? input.scope.sourceTypes
+          : undefined,
+        p_source_qualities: input.scope.sourceQualities.length
+          ? input.scope.sourceQualities
+          : undefined,
+        p_limit: CANDIDATE_LIMIT,
+      }),
+    ]);
   if (lexicalResult.error) {
     throw new Error(`Lexical search failed: ${lexicalResult.error.code}`);
   }
   if (semanticResult.error) {
     throw new Error(`Semantic search failed: ${semanticResult.error.code}`);
   }
+  if (sourceLexicalResult.error) {
+    throw new Error(`Source search failed: ${sourceLexicalResult.error.code}`);
+  }
+
+  const sources = sourceLexicalResult.data
+    .slice(0, input.limit)
+    .map((result) => ({
+      id: result.source_id,
+      type: "source" as const,
+      title: result.title,
+      subtitle: `${result.source_type} · ${result.quality}`,
+      score: Number((1 / (RRF_K + Number(result.rank))).toFixed(8)),
+      matchReasons: ["lexical" as const],
+      matchDetail: "Matched an immutable source segment",
+      snippet: result.snippet,
+      route: `/sources/${result.source_id}#segment-${result.segment_id}`,
+    }));
 
   const fused = reciprocalRankFuse(
     [
@@ -67,7 +96,7 @@ export async function searchAtlas(
     RRF_K,
   ).slice(0, input.limit);
   if (!fused.length) {
-    return { query: input.query, concepts: [], sources: [] };
+    return { query: input.query, concepts: [], sources };
   }
 
   const ids = fused.map((result) => result.id);
@@ -140,8 +169,6 @@ export async function searchAtlas(
   return {
     query: input.query,
     concepts,
-    // Source metadata and segments are introduced in Milestone 5. Keeping this
-    // channel explicit avoids pretending concept synthesis is primary evidence.
-    sources: [],
+    sources,
   };
 }

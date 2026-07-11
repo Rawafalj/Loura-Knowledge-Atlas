@@ -7,31 +7,6 @@ export type Json =
   | Json[];
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
       audit_events: {
@@ -617,6 +592,104 @@ export type Database = {
           },
         ];
       };
+      ingestion_jobs: {
+        Row: {
+          allow_external_ai: boolean;
+          attempt_count: number;
+          completed_at: string | null;
+          created_at: string;
+          error_code: string | null;
+          error_message_sanitized: string | null;
+          extraction_schema_version: string;
+          force_reprocess: boolean;
+          id: string;
+          idempotency_key: string;
+          parser_profile: string;
+          progress: number;
+          queue_message_id: number | null;
+          requested_by: string;
+          source_id: string;
+          source_version_id: string | null;
+          stage: Database["public"]["Enums"]["ingestion_stage"];
+          started_at: string | null;
+          status: Database["public"]["Enums"]["ingestion_job_status"];
+          workspace_id: string;
+        };
+        Insert: {
+          allow_external_ai?: boolean;
+          attempt_count?: number;
+          completed_at?: string | null;
+          created_at?: string;
+          error_code?: string | null;
+          error_message_sanitized?: string | null;
+          extraction_schema_version: string;
+          force_reprocess?: boolean;
+          id?: string;
+          idempotency_key: string;
+          parser_profile: string;
+          progress?: number;
+          queue_message_id?: number | null;
+          requested_by: string;
+          source_id: string;
+          source_version_id?: string | null;
+          stage?: Database["public"]["Enums"]["ingestion_stage"];
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["ingestion_job_status"];
+          workspace_id: string;
+        };
+        Update: {
+          allow_external_ai?: boolean;
+          attempt_count?: number;
+          completed_at?: string | null;
+          created_at?: string;
+          error_code?: string | null;
+          error_message_sanitized?: string | null;
+          extraction_schema_version?: string;
+          force_reprocess?: boolean;
+          id?: string;
+          idempotency_key?: string;
+          parser_profile?: string;
+          progress?: number;
+          queue_message_id?: number | null;
+          requested_by?: string;
+          source_id?: string;
+          source_version_id?: string | null;
+          stage?: Database["public"]["Enums"]["ingestion_stage"];
+          started_at?: string | null;
+          status?: Database["public"]["Enums"]["ingestion_job_status"];
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ingestion_jobs_requested_by_profiles_id_fk";
+            columns: ["requested_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ingestion_jobs_source_workspace_fk";
+            columns: ["source_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "ingestion_jobs_version_workspace_fk";
+            columns: ["source_version_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "source_versions";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "ingestion_jobs_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       learning_path_steps: {
         Row: {
           branch_key: string;
@@ -973,6 +1046,274 @@ export type Database = {
           },
         ];
       };
+      source_segments: {
+        Row: {
+          created_at: string;
+          embedding: string | null;
+          embedding_model: string | null;
+          heading_path: string[];
+          id: string;
+          ordinal: number;
+          page_end: number | null;
+          page_start: number | null;
+          provenance: Json;
+          search_document: unknown;
+          segment_type: Database["public"]["Enums"]["source_segment_type"];
+          source_version_id: string;
+          stable_key: string;
+          text: string;
+          token_count: number;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          embedding?: string | null;
+          embedding_model?: string | null;
+          heading_path?: string[];
+          id?: string;
+          ordinal: number;
+          page_end?: number | null;
+          page_start?: number | null;
+          provenance?: Json;
+          search_document?: unknown;
+          segment_type: Database["public"]["Enums"]["source_segment_type"];
+          source_version_id: string;
+          stable_key: string;
+          text: string;
+          token_count: number;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string;
+          embedding?: string | null;
+          embedding_model?: string | null;
+          heading_path?: string[];
+          id?: string;
+          ordinal?: number;
+          page_end?: number | null;
+          page_start?: number | null;
+          provenance?: Json;
+          search_document?: unknown;
+          segment_type?: Database["public"]["Enums"]["source_segment_type"];
+          source_version_id?: string;
+          stable_key?: string;
+          text?: string;
+          token_count?: number;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "source_segments_version_workspace_fk";
+            columns: ["source_version_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "source_versions";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "source_segments_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      source_versions: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          docling_json_path: string | null;
+          error_code: string | null;
+          error_message_sanitized: string | null;
+          extracted_metadata: Json;
+          file_checksum_sha256: string;
+          id: string;
+          idempotency_key: string;
+          language_code: string | null;
+          markdown_path: string | null;
+          page_count: number | null;
+          parser_name: string;
+          parser_profile: string;
+          parser_version: string;
+          processing_status: Database["public"]["Enums"]["source_version_status"];
+          source_id: string;
+          version_number: number;
+          workspace_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          docling_json_path?: string | null;
+          error_code?: string | null;
+          error_message_sanitized?: string | null;
+          extracted_metadata?: Json;
+          file_checksum_sha256: string;
+          id?: string;
+          idempotency_key: string;
+          language_code?: string | null;
+          markdown_path?: string | null;
+          page_count?: number | null;
+          parser_name: string;
+          parser_profile: string;
+          parser_version: string;
+          processing_status?: Database["public"]["Enums"]["source_version_status"];
+          source_id: string;
+          version_number: number;
+          workspace_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          docling_json_path?: string | null;
+          error_code?: string | null;
+          error_message_sanitized?: string | null;
+          extracted_metadata?: Json;
+          file_checksum_sha256?: string;
+          id?: string;
+          idempotency_key?: string;
+          language_code?: string | null;
+          markdown_path?: string | null;
+          page_count?: number | null;
+          parser_name?: string;
+          parser_profile?: string;
+          parser_version?: string;
+          processing_status?: Database["public"]["Enums"]["source_version_status"];
+          source_id?: string;
+          version_number?: number;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "source_versions_source_workspace_fk";
+            columns: ["source_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "sources";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "source_versions_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      sources: {
+        Row: {
+          added_by: string;
+          authors: Json;
+          created_at: string;
+          deleted_at: string | null;
+          external_ai_policy: Database["public"]["Enums"]["external_ai_policy"];
+          external_identifier: string | null;
+          external_url: string | null;
+          file_checksum_sha256: string | null;
+          file_mime_type: string | null;
+          file_name: string | null;
+          file_size_bytes: number | null;
+          final_url: string | null;
+          id: string;
+          ingestion_status: Database["public"]["Enums"]["source_ingestion_status"];
+          latest_source_version_id: string | null;
+          organization: string | null;
+          origin: Database["public"]["Enums"]["source_origin"];
+          publication_date: string | null;
+          quality: Database["public"]["Enums"]["source_quality"];
+          rights_note: string;
+          sensitivity: Database["public"]["Enums"]["source_sensitivity"];
+          source_type: Database["public"]["Enums"]["source_type"];
+          storage_path: string | null;
+          subtitle: string | null;
+          tags: string[];
+          title: string;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          added_by: string;
+          authors?: Json;
+          created_at?: string;
+          deleted_at?: string | null;
+          external_ai_policy?: Database["public"]["Enums"]["external_ai_policy"];
+          external_identifier?: string | null;
+          external_url?: string | null;
+          file_checksum_sha256?: string | null;
+          file_mime_type?: string | null;
+          file_name?: string | null;
+          file_size_bytes?: number | null;
+          final_url?: string | null;
+          id?: string;
+          ingestion_status?: Database["public"]["Enums"]["source_ingestion_status"];
+          latest_source_version_id?: string | null;
+          organization?: string | null;
+          origin: Database["public"]["Enums"]["source_origin"];
+          publication_date?: string | null;
+          quality?: Database["public"]["Enums"]["source_quality"];
+          rights_note: string;
+          sensitivity?: Database["public"]["Enums"]["source_sensitivity"];
+          source_type: Database["public"]["Enums"]["source_type"];
+          storage_path?: string | null;
+          subtitle?: string | null;
+          tags?: string[];
+          title: string;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          added_by?: string;
+          authors?: Json;
+          created_at?: string;
+          deleted_at?: string | null;
+          external_ai_policy?: Database["public"]["Enums"]["external_ai_policy"];
+          external_identifier?: string | null;
+          external_url?: string | null;
+          file_checksum_sha256?: string | null;
+          file_mime_type?: string | null;
+          file_name?: string | null;
+          file_size_bytes?: number | null;
+          final_url?: string | null;
+          id?: string;
+          ingestion_status?: Database["public"]["Enums"]["source_ingestion_status"];
+          latest_source_version_id?: string | null;
+          organization?: string | null;
+          origin?: Database["public"]["Enums"]["source_origin"];
+          publication_date?: string | null;
+          quality?: Database["public"]["Enums"]["source_quality"];
+          rights_note?: string;
+          sensitivity?: Database["public"]["Enums"]["source_sensitivity"];
+          source_type?: Database["public"]["Enums"]["source_type"];
+          storage_path?: string | null;
+          subtitle?: string | null;
+          tags?: string[];
+          title?: string;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "sources_added_by_profiles_id_fk";
+            columns: ["added_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sources_latest_version_workspace_fk";
+            columns: ["latest_source_version_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "source_versions";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "sources_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_mastery: {
         Row: {
           concept_id: string;
@@ -1141,6 +1482,36 @@ export type Database = {
         };
         Returns: Json;
       };
+      create_file_source: {
+        Args: {
+          p_checksum_sha256: string;
+          p_file_name: string;
+          p_metadata: Json;
+          p_mime_type: string;
+          p_size_bytes: number;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      create_url_source: {
+        Args: {
+          p_extraction_schema_version?: string;
+          p_metadata: Json;
+          p_parser_profile?: string;
+          p_url: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      enqueue_source_ingestion: {
+        Args: {
+          p_extraction_schema_version?: string;
+          p_parser_profile?: string;
+          p_source_id: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
       get_concept_neighborhood: {
         Args: {
           p_concept_id: string;
@@ -1189,6 +1560,10 @@ export type Database = {
         Args: { p_aliases: Json; p_concept_id: string; p_workspace_id: string };
         Returns: undefined;
       };
+      retry_ingestion_job: {
+        Args: { p_job_id: string; p_workspace_id: string };
+        Returns: Json;
+      };
       search_concepts_lexical: {
         Args: {
           p_content_statuses?: Database["public"]["Enums"]["content_status"][];
@@ -1219,6 +1594,25 @@ export type Database = {
           id: string;
           rank: number;
           semantic_distance: number;
+        }[];
+      };
+      search_source_segments_lexical: {
+        Args: {
+          p_limit?: number;
+          p_query: string;
+          p_source_qualities?: Database["public"]["Enums"]["source_quality"][];
+          p_source_types?: Database["public"]["Enums"]["source_type"][];
+          p_workspace_id: string;
+        };
+        Returns: {
+          lexical_score: number;
+          quality: Database["public"]["Enums"]["source_quality"];
+          rank: number;
+          segment_id: string;
+          snippet: string;
+          source_id: string;
+          source_type: Database["public"]["Enums"]["source_type"];
+          title: string;
         }[];
       };
       set_concept_embedding: {
@@ -1304,6 +1698,10 @@ export type Database = {
       content_priority: "now" | "next" | "later" | "reference";
       content_status: "draft" | "reviewed" | "deprecated";
       domain_kind: "root" | "core" | "overlay";
+      external_ai_policy: "allowed" | "denied" | "explicit_per_run";
+      ingestion_job_status:
+        "queued" | "running" | "completed" | "failed" | "dead_letter";
+      ingestion_stage: "download" | "parse" | "persist" | "segment";
       mastery_evidence_type:
         | "self_assessment"
         | "explanation"
@@ -1324,6 +1722,42 @@ export type Database = {
         | "epistemic";
       relation_provenance: "human" | "source_extracted" | "inferred";
       revision_change_source: "manual" | "proposal" | "import" | "restore";
+      source_ingestion_status:
+        | "pending"
+        | "queued"
+        | "parsing"
+        | "persisting"
+        | "segmenting"
+        | "completed"
+        | "failed";
+      source_origin: "file" | "url";
+      source_quality:
+        "canonical" | "primary" | "secondary" | "practitioner" | "unknown";
+      source_segment_type:
+        | "heading"
+        | "paragraph"
+        | "list"
+        | "table"
+        | "figure_caption"
+        | "code"
+        | "formula"
+        | "transcript"
+        | "other";
+      source_sensitivity: "public" | "internal" | "confidential";
+      source_type:
+        | "book"
+        | "paper"
+        | "standard"
+        | "course"
+        | "documentation"
+        | "article"
+        | "webpage"
+        | "report"
+        | "thesis"
+        | "dataset"
+        | "note"
+        | "other";
+      source_version_status: "processing" | "completed" | "failed";
       workspace_role: "owner" | "editor" | "viewer";
     };
     CompositeTypes: {
@@ -1450,9 +1884,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       alias_type: [
@@ -1475,6 +1906,15 @@ export const Constants = {
       content_priority: ["now", "next", "later", "reference"],
       content_status: ["draft", "reviewed", "deprecated"],
       domain_kind: ["root", "core", "overlay"],
+      external_ai_policy: ["allowed", "denied", "explicit_per_run"],
+      ingestion_job_status: [
+        "queued",
+        "running",
+        "completed",
+        "failed",
+        "dead_letter",
+      ],
+      ingestion_stage: ["download", "parse", "persist", "segment"],
       mastery_evidence_type: [
         "self_assessment",
         "explanation",
@@ -1502,6 +1942,50 @@ export const Constants = {
       ],
       relation_provenance: ["human", "source_extracted", "inferred"],
       revision_change_source: ["manual", "proposal", "import", "restore"],
+      source_ingestion_status: [
+        "pending",
+        "queued",
+        "parsing",
+        "persisting",
+        "segmenting",
+        "completed",
+        "failed",
+      ],
+      source_origin: ["file", "url"],
+      source_quality: [
+        "canonical",
+        "primary",
+        "secondary",
+        "practitioner",
+        "unknown",
+      ],
+      source_segment_type: [
+        "heading",
+        "paragraph",
+        "list",
+        "table",
+        "figure_caption",
+        "code",
+        "formula",
+        "transcript",
+        "other",
+      ],
+      source_sensitivity: ["public", "internal", "confidential"],
+      source_type: [
+        "book",
+        "paper",
+        "standard",
+        "course",
+        "documentation",
+        "article",
+        "webpage",
+        "report",
+        "thesis",
+        "dataset",
+        "note",
+        "other",
+      ],
+      source_version_status: ["processing", "completed", "failed"],
       workspace_role: ["owner", "editor", "viewer"],
     },
   },

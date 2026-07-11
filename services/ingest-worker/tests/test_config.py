@@ -10,6 +10,7 @@ def test_defaults_to_mock_provider(monkeypatch) -> None:
 
     assert config.ai_provider == "mock"
     assert config.health_port == 8091
+    assert config.processing_ready is False
 
 
 def test_rejects_invalid_health_port(monkeypatch) -> None:

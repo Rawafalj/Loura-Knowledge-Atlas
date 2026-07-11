@@ -40,4 +40,3 @@ class MockEmbeddingClient:
             magnitude = sum(value**2 for value in vector) ** 0.5 or 1.0
             vectors.append([value / magnitude for value in vector])
         return vectors
-

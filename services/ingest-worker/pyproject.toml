@@ -1,9 +1,12 @@
 [project]
 name = "loura-ingest-worker"
 version = "0.1.0"
-description = "Loura Knowledge Atlas ingestion worker scaffold"
+description = "Deterministic Loura Knowledge Atlas document-ingestion worker"
 requires-python = ">=3.12,<3.14"
 dependencies = [
+  "docling==2.110.0",
+  "httpx==0.28.1",
+  "psycopg[binary]==3.3.4",
   "pydantic==2.13.4",
 ]
 
@@ -40,4 +43,3 @@ python_version = "3.12"
 strict = true
 packages = ["loura_ingest_worker"]
 mypy_path = "src"
-

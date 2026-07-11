@@ -1,8 +1,10 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   check,
   customType,
+  date,
   foreignKey,
   index,
   integer,
@@ -94,6 +96,76 @@ export const masteryEvidenceType = pgEnum("mastery_evidence_type", [
   "design_artifact",
   "critique",
   "external_evaluation",
+]);
+export const sourceOrigin = pgEnum("source_origin", ["file", "url"]);
+export const sourceType = pgEnum("source_type", [
+  "book",
+  "paper",
+  "standard",
+  "course",
+  "documentation",
+  "article",
+  "webpage",
+  "report",
+  "thesis",
+  "dataset",
+  "note",
+  "other",
+]);
+export const sourceQuality = pgEnum("source_quality", [
+  "canonical",
+  "primary",
+  "secondary",
+  "practitioner",
+  "unknown",
+]);
+export const sourceSensitivity = pgEnum("source_sensitivity", [
+  "public",
+  "internal",
+  "confidential",
+]);
+export const externalAiPolicy = pgEnum("external_ai_policy", [
+  "allowed",
+  "denied",
+  "explicit_per_run",
+]);
+export const sourceIngestionStatus = pgEnum("source_ingestion_status", [
+  "pending",
+  "queued",
+  "parsing",
+  "persisting",
+  "segmenting",
+  "completed",
+  "failed",
+]);
+export const sourceVersionStatus = pgEnum("source_version_status", [
+  "processing",
+  "completed",
+  "failed",
+]);
+export const sourceSegmentType = pgEnum("source_segment_type", [
+  "heading",
+  "paragraph",
+  "list",
+  "table",
+  "figure_caption",
+  "code",
+  "formula",
+  "transcript",
+  "other",
+]);
+export const ingestionJobStatus = pgEnum("ingestion_job_status", [
+  "queued",
+  "running",
+  "completed",
+  "failed",
+  "dead_letter",
+]);
+export const ingestionStage = pgEnum("ingestion_stage", [
+  "download",
+  "parse",
+  "persist",
+  "segment",
 ]);
 
 const timestamps = {
@@ -767,6 +839,275 @@ export const learningPrerequisiteWaivers = pgTable(
     check(
       "learning_waivers_distinct_concepts_check",
       sql`${table.targetConceptId} <> ${table.prerequisiteConceptId}`,
+    ),
+  ],
+);
+
+export const sources = pgTable(
+  "sources",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    origin: sourceOrigin("origin").notNull(),
+    title: text("title").notNull(),
+    subtitle: text("subtitle"),
+    sourceType: sourceType("source_type").notNull(),
+    authors: jsonb("authors").notNull().default([]),
+    organization: text("organization"),
+    publicationDate: date("publication_date"),
+    externalUrl: text("external_url"),
+    finalUrl: text("final_url"),
+    externalIdentifier: text("external_identifier"),
+    quality: sourceQuality("quality").notNull().default("unknown"),
+    sensitivity: sourceSensitivity("sensitivity").notNull().default("internal"),
+    externalAiPolicy: externalAiPolicy("external_ai_policy")
+      .notNull()
+      .default("denied"),
+    rightsNote: text("rights_note").notNull(),
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    fileName: text("file_name"),
+    fileMimeType: text("file_mime_type"),
+    fileSizeBytes: bigint("file_size_bytes", { mode: "number" }),
+    fileChecksumSha256: text("file_checksum_sha256"),
+    storagePath: text("storage_path"),
+    ingestionStatus: sourceIngestionStatus("ingestion_status")
+      .notNull()
+      .default("pending"),
+    latestSourceVersionId: uuid("latest_source_version_id"),
+    addedBy: uuid("added_by")
+      .notNull()
+      .references(() => profiles.id),
+    ...timestamps,
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("sources_id_workspace_unique").on(table.id, table.workspaceId),
+    uniqueIndex("sources_workspace_checksum_active_unique")
+      .on(table.workspaceId, table.fileChecksumSha256)
+      .where(
+        sql`${table.fileChecksumSha256} is not null and ${table.deletedAt} is null`,
+      ),
+    index("sources_workspace_status_created_idx").on(
+      table.workspaceId,
+      table.ingestionStatus,
+      table.createdAt,
+    ),
+    check("sources_title_check", sql`length(trim(${table.title})) > 0`),
+    check(
+      "sources_rights_note_check",
+      sql`length(trim(${table.rightsNote})) >= 3`,
+    ),
+    check(
+      "sources_checksum_check",
+      sql`${table.fileChecksumSha256} is null or ${table.fileChecksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "sources_origin_fields_check",
+      sql`(${table.origin} = 'file' and ${table.fileName} is not null and ${table.externalUrl} is null)
+          or (${table.origin} = 'url' and ${table.externalUrl} is not null)`,
+    ),
+    check(
+      "sources_file_size_check",
+      sql`${table.fileSizeBytes} is null or ${table.fileSizeBytes} > 0`,
+    ),
+  ],
+);
+
+export const sourceVersions = pgTable(
+  "source_versions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    sourceId: uuid("source_id").notNull(),
+    versionNumber: integer("version_number").notNull(),
+    idempotencyKey: text("idempotency_key").notNull(),
+    fileChecksumSha256: text("file_checksum_sha256").notNull(),
+    parserName: text("parser_name").notNull(),
+    parserVersion: text("parser_version").notNull(),
+    parserProfile: text("parser_profile").notNull(),
+    doclingJsonPath: text("docling_json_path"),
+    markdownPath: text("markdown_path"),
+    extractedMetadata: jsonb("extracted_metadata").notNull().default({}),
+    pageCount: integer("page_count"),
+    languageCode: text("language_code"),
+    processingStatus: sourceVersionStatus("processing_status")
+      .notNull()
+      .default("processing"),
+    errorCode: text("error_code"),
+    errorMessageSanitized: text("error_message_sanitized"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("source_versions_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    foreignKey({
+      name: "source_versions_source_workspace_fk",
+      columns: [table.sourceId, table.workspaceId],
+      foreignColumns: [sources.id, sources.workspaceId],
+    }).onDelete("cascade"),
+    unique("source_versions_source_number_unique").on(
+      table.sourceId,
+      table.versionNumber,
+    ),
+    unique("source_versions_workspace_idempotency_unique").on(
+      table.workspaceId,
+      table.idempotencyKey,
+    ),
+    index("source_versions_source_created_idx").on(
+      table.workspaceId,
+      table.sourceId,
+      table.createdAt,
+    ),
+    check("source_versions_number_check", sql`${table.versionNumber} > 0`),
+    check(
+      "source_versions_checksum_check",
+      sql`${table.fileChecksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+  ],
+);
+
+export const sourceSegments = pgTable(
+  "source_segments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    sourceVersionId: uuid("source_version_id").notNull(),
+    ordinal: integer("ordinal").notNull(),
+    stableKey: text("stable_key").notNull(),
+    segmentType: sourceSegmentType("segment_type").notNull(),
+    headingPath: text("heading_path")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    text: text("text").notNull(),
+    tokenCount: integer("token_count").notNull(),
+    pageStart: integer("page_start"),
+    pageEnd: integer("page_end"),
+    provenance: jsonb("provenance").notNull().default({}),
+    searchDocument: tsvector("search_document").generatedAlwaysAs(
+      sql`setweight(to_tsvector('english', coalesce("text", '')), 'B')`,
+    ),
+    embedding: vector("embedding", { dimensions: 1536 }),
+    embeddingModel: text("embedding_model"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("source_segments_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    foreignKey({
+      name: "source_segments_version_workspace_fk",
+      columns: [table.sourceVersionId, table.workspaceId],
+      foreignColumns: [sourceVersions.id, sourceVersions.workspaceId],
+    }).onDelete("cascade"),
+    unique("source_segments_version_ordinal_unique").on(
+      table.sourceVersionId,
+      table.ordinal,
+    ),
+    unique("source_segments_version_stable_key_unique").on(
+      table.sourceVersionId,
+      table.stableKey,
+    ),
+    index("source_segments_version_ordinal_idx").on(
+      table.workspaceId,
+      table.sourceVersionId,
+      table.ordinal,
+    ),
+    index("source_segments_search_document_idx").using(
+      "gin",
+      table.searchDocument,
+    ),
+    check("source_segments_ordinal_check", sql`${table.ordinal} > 0`),
+    check("source_segments_text_check", sql`length(trim(${table.text})) > 0`),
+    check("source_segments_token_count_check", sql`${table.tokenCount} > 0`),
+    check(
+      "source_segments_page_range_check",
+      sql`${table.pageStart} is null or (${table.pageStart} > 0 and (${table.pageEnd} is null or ${table.pageEnd} >= ${table.pageStart}))`,
+    ),
+  ],
+);
+
+export const ingestionJobs = pgTable(
+  "ingestion_jobs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    sourceId: uuid("source_id").notNull(),
+    sourceVersionId: uuid("source_version_id"),
+    queueMessageId: bigint("queue_message_id", { mode: "number" }),
+    status: ingestionJobStatus("status").notNull().default("queued"),
+    stage: ingestionStage("stage").notNull().default("download"),
+    attemptCount: integer("attempt_count").notNull().default(0),
+    progress: numeric("progress", { precision: 5, scale: 2 })
+      .notNull()
+      .default("0"),
+    idempotencyKey: text("idempotency_key").notNull(),
+    parserProfile: text("parser_profile").notNull(),
+    extractionSchemaVersion: text("extraction_schema_version").notNull(),
+    allowExternalAi: boolean("allow_external_ai").notNull().default(false),
+    forceReprocess: boolean("force_reprocess").notNull().default(false),
+    requestedBy: uuid("requested_by")
+      .notNull()
+      .references(() => profiles.id),
+    errorCode: text("error_code"),
+    errorMessageSanitized: text("error_message_sanitized"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("ingestion_jobs_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    foreignKey({
+      name: "ingestion_jobs_source_workspace_fk",
+      columns: [table.sourceId, table.workspaceId],
+      foreignColumns: [sources.id, sources.workspaceId],
+    }).onDelete("cascade"),
+    foreignKey({
+      name: "ingestion_jobs_version_workspace_fk",
+      columns: [table.sourceVersionId, table.workspaceId],
+      foreignColumns: [sourceVersions.id, sourceVersions.workspaceId],
+    }),
+    unique("ingestion_jobs_workspace_idempotency_unique").on(
+      table.workspaceId,
+      table.idempotencyKey,
+    ),
+    index("ingestion_jobs_status_created_idx").on(
+      table.status,
+      table.createdAt,
+    ),
+    index("ingestion_jobs_workspace_source_idx").on(
+      table.workspaceId,
+      table.sourceId,
+      table.createdAt,
+    ),
+    check("ingestion_jobs_attempt_check", sql`${table.attemptCount} >= 0`),
+    check(
+      "ingestion_jobs_progress_check",
+      sql`${table.progress} between 0 and 100`,
     ),
   ],
 );

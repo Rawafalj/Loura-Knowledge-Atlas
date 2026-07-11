@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { sourceQualities, sourceTypes } from "@/lib/sources/contracts";
+
 export const searchMatchReasons = [
   "title",
   "alias",
@@ -17,8 +19,8 @@ export const searchInputSchema = z.object({
         .array(z.enum(["draft", "reviewed", "deprecated"]))
         .max(3)
         .default(["reviewed", "draft"]),
-      sourceTypes: z.array(z.string().max(40)).max(20).default([]),
-      sourceQualities: z.array(z.string().max(40)).max(20).default([]),
+      sourceTypes: z.array(z.enum(sourceTypes)).max(20).default([]),
+      sourceQualities: z.array(z.enum(sourceQualities)).max(20).default([]),
     })
     .default({
       domainIds: [],

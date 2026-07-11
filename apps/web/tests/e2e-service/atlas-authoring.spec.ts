@@ -13,7 +13,7 @@ const searchLatencyBudgetMs = Number(
   process.env.SEARCH_E2E_LATENCY_BUDGET_MS ?? (process.env.CI ? 1_000 : 5_000),
 );
 
-test.describe("Milestones 2–4 atlas workflow", () => {
+test.describe("Milestones 2–5 atlas workflow", () => {
   let admin: SupabaseClient<Database>;
   let database: ReturnType<typeof postgres>;
   let ownerId: string | null = null;
@@ -41,7 +41,7 @@ test.describe("Milestones 2–4 atlas workflow", () => {
     if (database) await database.end();
   });
 
-  test("owner browses, authors, revisions, relates, and deprecates canonical concepts", async ({
+  test("owner authors the atlas, learns, and ingests immutable source evidence", async ({
     browser,
     page,
   }) => {
@@ -288,6 +288,59 @@ test.describe("Milestones 2–4 atlas workflow", () => {
     await expect(
       page.getByRole("row").filter({ hasText: "System and Boundary" }),
     ).toContainText("applied analysis");
+
+    await page.goto("/sources/new");
+    await page.getByLabel("Source file").setInputFiles({
+      name: "atlas-e2e.md",
+      mimeType: "text/markdown",
+      buffer: Buffer.from(
+        "# Service-backed ingestion evidence\n\nRetries require explicit idempotent operation identity.",
+      ),
+    });
+    await page
+      .getByRole("textbox", { name: "Title", exact: true })
+      .fill("Service-backed ingestion fixture");
+    await page
+      .getByLabel("Rights note")
+      .fill(
+        "Locally authored fixture for private deterministic ingestion testing.",
+      );
+    await page.getByRole("button", { name: "Add and ingest source" }).click();
+    await expect(page).toHaveURL(/\/sources\/[0-9a-f-]+\?job=[0-9a-f-]+$/);
+    const progressRegion = page.getByLabel("Ingestion progress");
+    await expect(progressRegion).toContainText("completed", {
+      timeout: 120_000,
+    });
+    await expect(
+      page.getByRole("heading", { name: "Structural segments" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Retries require explicit idempotent operation identity/),
+    ).toBeVisible();
+    const [sourceEvidence] = await database<
+      { source_count: number; version_count: number; segment_count: number }[]
+    >`
+      select
+        (select count(*)::integer from public.sources where workspace_id = ${workspaceId}) as source_count,
+        (select count(*)::integer from public.source_versions where workspace_id = ${workspaceId} and processing_status = 'completed') as version_count,
+        (select count(*)::integer from public.source_segments where workspace_id = ${workspaceId}) as segment_count
+    `;
+    expect(sourceEvidence).toMatchObject({
+      source_count: 1,
+      version_count: 1,
+      segment_count: 2,
+    });
+    await page.keyboard.press("Control+k");
+    const sourceSearch = page.getByRole("textbox", {
+      name: "Search concepts and sources",
+    });
+    await sourceSearch.fill("service-backed ingestion evidence");
+    const sourceResult = page.getByRole("option", {
+      name: /Service-backed ingestion fixture/,
+    });
+    await expect(sourceResult).toContainText("immutable source segment");
+    await sourceResult.click();
+    await expect(page).toHaveURL(/\/sources\/[0-9a-f-]+#segment-/);
 
     await page.goto("/concepts/test-observation");
     await page.getByRole("link", { name: "Edit concept" }).click();

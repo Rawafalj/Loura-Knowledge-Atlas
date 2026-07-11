@@ -268,3 +268,34 @@ Mastery writes go through one transactional PostgreSQL function that appends evi
 ### Consequences
 
 Readiness explanations remain deterministic and testable. Viewers can maintain only their own learning state while remaining unable to edit canonical routes. Optional branches retain a branch key without introducing a workflow engine.
+
+---
+
+## ADR-008 — Deterministic, immutable source ingestion boundary
+
+**Status:** Accepted
+
+**Date:** 2026-07-11
+
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+Source ingestion crosses three trust boundaries: untrusted bytes, private storage, and a parser with a large dependency surface. The product also requires retriable jobs without duplicate evidence and forbids AI from writing canonical content.
+
+### Decision
+
+Originals and parser-derived artifacts live in separate private Supabase Storage buckets. Authenticated owner/editor sessions create upload intents and explicit URL jobs; the service-role key exists only in the worker. A durable versioned `pgmq` message invokes a pinned, lazily imported Docling parser. PDF enrichment features and remote parser services are disabled. Every completed version is identified by source checksum, parser profile, and deterministic extraction-schema version; completed versions and their structural segments are database-immutable.
+
+Explicit URLs are restricted to HTTP/HTTPS, standard ports, approved MIME types, bounded sizes, and public DNS/IP results. Every redirect is revalidated by both the web boundary and worker fetch boundary. The fetcher never crawls discovered links. Source text remains untrusted data and no external AI call or extraction proposal occurs in this milestone.
+
+### Alternatives considered
+
+- Parsing in the web process — rejected because heavyweight, untrusted conversion should not share the request runtime.
+- A service-role web data path — rejected because routine authenticated access must remain protected by RLS.
+- Docling's slim extra — rejected because the supported converter surface still imports required document/PDF backends outside that extra.
+- Updating a completed parse in place — rejected because citations must retain an immutable evidence target.
+
+### Consequences
+
+Worker images and lockfiles are larger, but web and health startup stay lightweight. Parser upgrades or profile changes create a new immutable version. Retries reuse the same version key and never duplicate completed segments. Malware scanning and isolated conversion infrastructure remain release-hardening concerns; v0.1 accepts only explicitly supported formats and treats all parsed content as non-executable.

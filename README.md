@@ -89,7 +89,7 @@ The v0.1 product is complete when an authenticated owner can:
 
 ## Repository status
 
-Milestone 4 adds the curated 15-step closed-loop operational execution route, prerequisite-aware next-ready explanations, transactional path editing, personal mastery targets and status, immutable evidence history, reasoned learner waivers, concept-level mastery controls, and a domain/path mastery-gap view. Source ingestion and live AI remain intentionally deferred to later milestones.
+Milestone 5 adds a private source library, immutable parser-versioned source versions and structural segments, explicit file and SSRF-safe URL submission, durable `pgmq` jobs, deterministic Docling parsing, progress/retry views, and source-aware lexical search. AI extraction and live model calls remain intentionally deferred to Milestone 6.
 
 ## Prerequisites
 
@@ -119,18 +119,29 @@ pnpm dev
 
 After Supabase starts, run `pnpm exec supabase status` and copy its local anonymous key into `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`. The local API and database URLs already match `.env.example`.
 
-In another terminal, start the worker health process:
+In another terminal, start the worker in health-only mode:
 
 ```bash
 pnpm worker:dev
 ```
+
+To consume local ingestion jobs, copy the service-role key from `pnpm exec supabase status` into `.env.local`, export that file, and enable polling only in the worker terminal:
+
+```bash
+set -a
+source .env.local
+set +a
+WORKER_PROCESS_JOBS=true pnpm worker:dev
+```
+
+The service-role key is intentionally confined to this worker process. Browser and routine web access continue to use authenticated sessions so Row Level Security remains authoritative.
 
 Health endpoints:
 
 - web: `http://127.0.0.1:3000/api/health`
 - worker: `http://127.0.0.1:8091/healthz`
 
-The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 4.
+The default `AI_PROVIDER=mock` requires no OpenAI key. Milestone 5 ingestion is deterministic and makes no external AI calls, including when a source records a future external-AI policy.
 
 ## Verification
 
@@ -160,4 +171,4 @@ Copy `.env.example` locally and never commit real credentials. Supabase service-
 
 ## Dependency policy
 
-Exact direct versions and roles are recorded in `docs/DEPENDENCIES.md`. Docling and provider SDKs remain deferred until their implementing milestones.
+Exact direct versions and roles are recorded in `docs/DEPENDENCIES.md`. Docling is isolated in the worker and imported lazily so health startup does not load its parser stack. Provider SDKs remain deferred until their implementing milestones.

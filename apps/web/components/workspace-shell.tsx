@@ -50,8 +50,11 @@ export function WorkspaceShell({
           <Link href="/mastery" className="nav-link">
             Mastery
           </Link>
+          <p className="nav-label">Research</p>
+          <Link href="/sources" className="nav-link">
+            Sources
+          </Link>
           <p className="nav-label">Later milestones</p>
-          <span className="nav-link nav-link--disabled">Sources</span>
           <span className="nav-link nav-link--disabled">Ask Atlas</span>
         </nav>
         <div className="sidebar-footer">

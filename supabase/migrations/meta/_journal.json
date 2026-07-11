@@ -29,6 +29,13 @@
       "when": 1783777983816,
       "tag": "0004_milestone_4_learning_mastery",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783784955343,
+      "tag": "0005_milestone_5_source_ingestion",
+      "breakpoints": true
     }
   ]
 }

@@ -1,30 +1,33 @@
-# Dependency Inventory through Milestone 4
+# Dependency Inventory through Milestone 5
 
 Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockfiles.
 
 ## Production runtime
 
-| Dependency     | Version | Role                                                  | License    |
-| -------------- | ------: | ----------------------------------------------------- | ---------- |
-| Next.js        | 16.2.10 | Web framework and server runtime                      | MIT        |
-| React          |  19.2.7 | Web rendering                                         | MIT        |
-| React DOM      |  19.2.7 | Browser rendering                                     | MIT        |
-| Zod            |   4.4.3 | External input and AI fixture validation              | MIT        |
-| Pydantic       |  2.13.4 | Worker configuration and structured-output validation | MIT        |
-| Supabase JS    | 2.110.2 | Typed authentication and user-scoped database access  | MIT        |
-| Supabase SSR   |  0.12.0 | Cookie-backed server authentication sessions          | MIT        |
-| Drizzle ORM    |  0.45.2 | Canonical TypeScript database schema                  | Apache-2.0 |
-| Postgres.js    |   3.4.9 | Local database integration and concurrency tests      | Unlicense  |
-| YAML           |   2.9.0 | Atlas seed parsing                                    | ISC        |
-| MDXEditor      |   4.0.4 | Structured Markdown authoring                         | MIT        |
-| react-markdown |  10.1.0 | Safe rendered Markdown reading views                  | MIT        |
-| remark-gfm     |   4.0.1 | GitHub-flavored Markdown support                      | MIT        |
-| Tailwind CSS   |   4.3.2 | Utility engine and shared design tokens               | MIT        |
-| PostCSS        |  8.5.16 | CSS transformation pipeline                           | MIT        |
-| React Flow     | 12.11.2 | Bounded local graph interaction                       | MIT        |
-| ELK.js         |  0.11.1 | Deterministic layered graph layout                    | EPL-2.0    |
+| Dependency     | Version | Role                                                   | License       |
+| -------------- | ------: | ------------------------------------------------------ | ------------- |
+| Next.js        | 16.2.10 | Web framework and server runtime                       | MIT           |
+| React          |  19.2.7 | Web rendering                                          | MIT           |
+| React DOM      |  19.2.7 | Browser rendering                                      | MIT           |
+| Zod            |   4.4.3 | External input and AI fixture validation               | MIT           |
+| Pydantic       |  2.13.4 | Worker configuration and structured-output validation  | MIT           |
+| Supabase JS    | 2.110.2 | Typed authentication and user-scoped database access   | MIT           |
+| Supabase SSR   |  0.12.0 | Cookie-backed server authentication sessions           | MIT           |
+| Drizzle ORM    |  0.45.2 | Canonical TypeScript database schema                   | Apache-2.0    |
+| Postgres.js    |   3.4.9 | Local database integration and concurrency tests       | Unlicense     |
+| YAML           |   2.9.0 | Atlas seed parsing                                     | ISC           |
+| MDXEditor      |   4.0.4 | Structured Markdown authoring                          | MIT           |
+| react-markdown |  10.1.0 | Safe rendered Markdown reading views                   | MIT           |
+| remark-gfm     |   4.0.1 | GitHub-flavored Markdown support                       | MIT           |
+| Tailwind CSS   |   4.3.2 | Utility engine and shared design tokens                | MIT           |
+| PostCSS        |  8.5.16 | CSS transformation pipeline                            | MIT           |
+| React Flow     | 12.11.2 | Bounded local graph interaction                        | MIT           |
+| ELK.js         |  0.11.1 | Deterministic layered graph layout                     | EPL-2.0       |
+| Docling        | 2.110.0 | Deterministic document conversion and structural parse | MIT           |
+| HTTPX          |  0.28.1 | Size-bounded, redirect-controlled URL retrieval        | BSD-3-Clause  |
+| Psycopg        |   3.3.4 | Worker PostgreSQL and durable `pgmq` access            | LGPL-3.0-only |
 
-The worker health endpoint uses the Python standard library. Docling and both OpenAI SDKs are intentionally deferred to their implementation milestones. pgvector 0.8.2 is supplied by the local Supabase PostgreSQL image and enabled as a database extension rather than installed as an application package.
+The worker health endpoint uses the Python standard library and imports Docling only when a job reaches parsing. Docling's full pinned distribution is used because its public `DocumentConverter` imports PDF and document backends that are not satisfied by the slim extra alone. OCR, table-model enrichment, picture classification, picture description, and remote services are disabled for deterministic PDF fixtures. Both OpenAI SDKs remain intentionally deferred. pgvector 0.8.2 and pgmq are supplied by the local Supabase PostgreSQL image and enabled as database extensions rather than installed as application packages.
 
 ## Toolchain and test dependencies
 
