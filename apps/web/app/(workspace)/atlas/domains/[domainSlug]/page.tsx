@@ -161,11 +161,11 @@ export default async function DomainPage({
           </section>
           <section
             className="placeholder-grid"
-            aria-label="Deferred domain views"
+            aria-label="Domain companion views"
           >
             <div>
               <strong>Map</strong>
-              <span>Local visualization begins in Milestone 3.</span>
+              <span>Open a concept to explore its local relationship map.</span>
             </div>
             <div>
               <strong>Paths</strong>

@@ -19,6 +19,8 @@
     "@mdxeditor/editor": "4.0.4",
     "@supabase/ssr": "0.12.0",
     "@supabase/supabase-js": "2.110.2",
+    "@xyflow/react": "12.11.2",
+    "elkjs": "0.11.1",
     "next": "16.2.10",
     "react": "19.2.7",
     "react-dom": "19.2.7",

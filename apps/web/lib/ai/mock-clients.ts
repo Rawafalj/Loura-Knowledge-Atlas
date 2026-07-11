@@ -5,6 +5,8 @@ import type {
   StructuredModelClient,
 } from "./contracts";
 
+export const MOCK_EMBEDDING_MODEL_ID = "mock-charcode-v1";
+
 export class MockStructuredModelClient implements StructuredModelClient {
   public constructor(private readonly fixture: unknown) {}
 

@@ -5,6 +5,8 @@ import { Badge } from "@loura/ui";
 import type { WorkspaceMembership } from "@/lib/auth/session";
 import { signOut } from "@/app/atlas/actions";
 
+import { CommandPalette } from "./search/command-palette";
+
 const primaryNavigation = [
   { href: "/atlas", label: "World map" },
   { href: "/atlas#domains", label: "Domains" },
@@ -64,7 +66,7 @@ export function WorkspaceShell({
             <strong>{membership.workspace.name}</strong>
             <span>Private workspace</span>
           </div>
-          <span className="utility-hint">Search arrives in Milestone 3</span>
+          <CommandPalette workspaceId={membership.workspaceId} />
         </header>
         <main className="workspace-main">{children}</main>
       </div>

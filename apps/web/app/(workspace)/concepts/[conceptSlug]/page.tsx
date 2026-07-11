@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge, EmptyState, PageHeader } from "@loura/ui";
 
+import { ConceptGraph } from "@/components/graph/concept-graph";
 import { Markdown } from "@/components/markdown";
 import { RelationshipTable } from "@/components/relationship-table";
+import { getConceptNeighborhood } from "@/lib/atlas/neighborhood-query";
 import { getConceptView } from "@/lib/atlas/queries";
-import { buildConceptNeighborhood } from "@/lib/atlas/neighborhood";
 import { requireWorkspaceMembership } from "@/lib/auth/session";
 
 const tabs = [
@@ -52,7 +53,10 @@ export default async function ConceptPage({
   if (!view) notFound();
   const activeTab = tabFrom(query.tab);
   const canEdit = membership.role !== "viewer";
-  const neighborhood = buildConceptNeighborhood(view);
+  const neighborhood =
+    activeTab === "relationships"
+      ? await getConceptNeighborhood(membership.workspaceId, view.concept.id)
+      : null;
 
   return (
     <>
@@ -211,6 +215,7 @@ export default async function ConceptPage({
                   {view.relations.length} edges
                 </span>
               </div>
+              {neighborhood ? <ConceptGraph dataset={neighborhood} /> : null}
               {view.relations.length ? (
                 <RelationshipTable
                   relations={view.relations}
@@ -237,14 +242,6 @@ export default async function ConceptPage({
                   </p>
                 </EmptyState>
               )}
-              <p className="neighborhood-note">
-                Neighborhood service: {neighborhood.nodes.length} nodes and{" "}
-                {neighborhood.edges.length} edges
-                {neighborhood.truncated
-                  ? " (bounded by the configured node cap)"
-                  : ""}
-                . Visualization is intentionally deferred.
-              </p>
             </section>
           ) : null}
 

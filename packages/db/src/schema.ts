@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  customType,
   foreignKey,
   index,
   integer,
@@ -16,6 +17,7 @@ import {
   unique,
   uniqueIndex,
   uuid,
+  vector,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
@@ -86,6 +88,10 @@ const timestamps = {
     .defaultNow()
     .notNull(),
 };
+
+const tsvector = customType<{ data: string }>({
+  dataType: () => "tsvector",
+});
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
@@ -208,6 +214,24 @@ export const concepts = pgTable(
     replacementConceptId: uuid("replacement_concept_id").references(
       (): AnyPgColumn => concepts.id,
     ),
+    searchDocument: tsvector("search_document").generatedAlwaysAs(
+      sql`setweight(to_tsvector('english', coalesce("canonical_name", '')), 'A') ||
+          setweight(to_tsvector('english', coalesce("concise_definition", '')), 'B') ||
+          setweight(to_tsvector('english',
+            coalesce("synthesis_markdown", '') || ' ' ||
+            coalesce("why_it_exists_markdown", '') || ' ' ||
+            coalesce("mechanism_markdown", '') || ' ' ||
+            coalesce("examples_markdown", '') || ' ' ||
+            coalesce("counterexamples_markdown", '') || ' ' ||
+            coalesce("failure_modes_markdown", '') || ' ' ||
+            coalesce("common_confusions_markdown", '')
+          ), 'C')`,
+    ),
+    embedding: vector("embedding", { dimensions: 1536 }),
+    embeddingModel: text("embedding_model"),
+    embeddingUpdatedAt: timestamp("embedding_updated_at", {
+      withTimezone: true,
+    }),
     lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
     createdBy: uuid("created_by")
       .notNull()
@@ -231,6 +255,7 @@ export const concepts = pgTable(
       table.workspaceId,
       table.canonicalParentId,
     ),
+    index("concepts_search_document_idx").using("gin", table.searchDocument),
     foreignKey({
       name: "concepts_domain_workspace_fk",
       columns: [table.canonicalDomainId, table.workspaceId],

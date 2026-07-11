@@ -1,4 +1,4 @@
-# Dependency Inventory through Milestone 2
+# Dependency Inventory through Milestone 3
 
 Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockfiles.
 
@@ -21,8 +21,10 @@ Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockf
 | remark-gfm     |   4.0.1 | GitHub-flavored Markdown support                      | MIT        |
 | Tailwind CSS   |   4.3.2 | Utility engine and shared design tokens               | MIT        |
 | PostCSS        |  8.5.16 | CSS transformation pipeline                           | MIT        |
+| React Flow     | 12.11.2 | Bounded local graph interaction                       | MIT        |
+| ELK.js         |  0.11.1 | Deterministic layered graph layout                    | EPL-2.0    |
 
-The worker health endpoint uses the Python standard library. Docling and both OpenAI SDKs are intentionally deferred to their implementation milestones.
+The worker health endpoint uses the Python standard library. Docling and both OpenAI SDKs are intentionally deferred to their implementation milestones. pgvector 0.8.2 is supplied by the local Supabase PostgreSQL image and enabled as a database extension rather than installed as an application package.
 
 ## Toolchain and test dependencies
 

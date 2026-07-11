@@ -319,6 +319,9 @@ export type Database = {
           created_at: string;
           created_by: string;
           deleted_at: string | null;
+          embedding: string | null;
+          embedding_model: string | null;
+          embedding_updated_at: string | null;
           examples_markdown: string | null;
           failure_modes_markdown: string | null;
           id: string;
@@ -327,6 +330,7 @@ export type Database = {
           priority: Database["public"]["Enums"]["content_priority"];
           replacement_concept_id: string | null;
           review_note: string | null;
+          search_document: unknown;
           slug: string;
           synthesis_markdown: string;
           target_mastery: number | null;
@@ -347,6 +351,9 @@ export type Database = {
           created_at?: string;
           created_by: string;
           deleted_at?: string | null;
+          embedding?: string | null;
+          embedding_model?: string | null;
+          embedding_updated_at?: string | null;
           examples_markdown?: string | null;
           failure_modes_markdown?: string | null;
           id?: string;
@@ -355,6 +362,7 @@ export type Database = {
           priority?: Database["public"]["Enums"]["content_priority"];
           replacement_concept_id?: string | null;
           review_note?: string | null;
+          search_document?: never;
           slug: string;
           synthesis_markdown?: string;
           target_mastery?: number | null;
@@ -375,6 +383,9 @@ export type Database = {
           created_at?: string;
           created_by?: string;
           deleted_at?: string | null;
+          embedding?: string | null;
+          embedding_model?: string | null;
+          embedding_updated_at?: string | null;
           examples_markdown?: string | null;
           failure_modes_markdown?: string | null;
           id?: string;
@@ -383,6 +394,7 @@ export type Database = {
           priority?: Database["public"]["Enums"]["content_priority"];
           replacement_concept_id?: string | null;
           review_note?: string | null;
+          search_document?: never;
           slug?: string;
           synthesis_markdown?: string;
           target_mastery?: number | null;
@@ -744,6 +756,16 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_concept_neighborhood: {
+        Args: {
+          p_concept_id: string;
+          p_depth?: number;
+          p_node_cap?: number;
+          p_relation_keys?: string[] | null;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
       install_atlas_seed: {
         Args: { p_seed: Json; p_workspace_id: string };
         Returns: Json;
@@ -769,6 +791,49 @@ export type Database = {
       shares_workspace_with: {
         Args: { profile_uuid: string };
         Returns: boolean;
+      };
+      search_concepts_lexical: {
+        Args: {
+          p_content_statuses?:
+            Database["public"]["Enums"]["content_status"][] | null;
+          p_domain_ids?: string[] | null;
+          p_limit?: number;
+          p_query: string;
+          p_workspace_id: string;
+        };
+        Returns: {
+          alias_match: boolean;
+          id: string;
+          lexical_score: number;
+          matched_alias: string | null;
+          rank: number;
+          text_match: boolean;
+          title_match: boolean;
+        }[];
+      };
+      search_concepts_semantic: {
+        Args: {
+          p_content_statuses?:
+            Database["public"]["Enums"]["content_status"][] | null;
+          p_domain_ids?: string[] | null;
+          p_limit?: number;
+          p_query_embedding: string;
+          p_workspace_id: string;
+        };
+        Returns: {
+          id: string;
+          rank: number;
+          semantic_distance: number;
+        }[];
+      };
+      set_concept_embedding: {
+        Args: {
+          p_concept_id: string;
+          p_embedding: string;
+          p_embedding_model: string;
+          p_workspace_id: string;
+        };
+        Returns: undefined;
       };
       remove_atlas_relation: {
         Args: {

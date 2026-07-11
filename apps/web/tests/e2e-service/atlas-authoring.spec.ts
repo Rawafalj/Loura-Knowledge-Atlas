@@ -10,7 +10,7 @@ const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const databaseUrl = process.env.SUPABASE_DB_URL;
 
-test.describe("Milestone 2 atlas workflow", () => {
+test.describe("Milestones 2–3 atlas workflow", () => {
   let admin: SupabaseClient<Database>;
   let database: ReturnType<typeof postgres>;
   let ownerId: string | null = null;
@@ -35,7 +35,7 @@ test.describe("Milestone 2 atlas workflow", () => {
     }
     if (viewerId) await admin.auth.admin.deleteUser(viewerId);
     if (ownerId) await admin.auth.admin.deleteUser(ownerId);
-    await database.end();
+    if (database) await database.end();
   });
 
   test("owner browses, authors, revisions, relates, and deprecates canonical concepts", async ({
@@ -139,6 +139,10 @@ test.describe("Milestone 2 atlas workflow", () => {
     ).toBeVisible();
 
     await page.getByRole("link", { name: "Edit concept" }).click();
+    await page.getByRole("button", { name: "Add alias" }).click();
+    await page
+      .getByLabel("Alias 1", { exact: true })
+      .fill("Closed-loop regulator");
     await page
       .getByLabel("Concise definition")
       .fill("Regulation that compares observed outcomes with a desired state.");
@@ -149,6 +153,24 @@ test.describe("Milestone 2 atlas workflow", () => {
     await expect(page).toHaveURL(/\/concepts\/feedback-control$/);
     await page.getByRole("link", { name: "History" }).click();
     await expect(page.getByText("Revision 2")).toBeVisible();
+
+    await page.keyboard.press("Control+k");
+    const searchInput = page.getByRole("textbox", {
+      name: "Search concepts and sources",
+    });
+    await expect(searchInput).toBeFocused();
+    const searchStartedAt = Date.now();
+    await searchInput.fill("closed-loop regulator");
+    const searchResult = page.getByRole("option", {
+      name: /Feedback Control/,
+    });
+    await expect(searchResult).toContainText(
+      "Matched alias: Closed-loop regulator",
+    );
+    expect(Date.now() - searchStartedAt).toBeLessThan(1_000);
+    await expect(searchResult).toContainText("alias");
+    await searchInput.press("Enter");
+    await expect(page).toHaveURL(/\/concepts\/feedback-control$/);
 
     await page.goto("/concepts/new?domain=research-reasoning-measurement");
     await page.getByLabel("Canonical name").fill("Observation");
@@ -174,6 +196,16 @@ test.describe("Milestone 2 atlas workflow", () => {
     await expect(page).toHaveURL(/\/concepts\/observation\?tab=relationships$/);
     await expect(page.getByRole("table")).toContainText("Feedback Control");
     await expect(page.getByRole("table")).toContainText("prerequisite for");
+    await expect(page.getByLabel("Local concept graph")).toBeVisible();
+    await page.getByLabel("Expansion depth").selectOption("2");
+    await page
+      .getByText("Open the graph as an accessible relationship list")
+      .click();
+    const graphList = page.getByRole("table", {
+      name: /visible relationships represented in the local graph/,
+    });
+    await expect(graphList).toContainText("Feedback Control");
+    await expect(graphList).toContainText("prerequisite_for");
 
     await page.getByRole("link", { name: "Edit concept" }).click();
     await page.getByLabel("Content status").selectOption("deprecated");

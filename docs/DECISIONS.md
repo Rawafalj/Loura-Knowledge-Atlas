@@ -205,3 +205,35 @@ Enforce workspace-local hierarchy, endpoint, relation-kind, symmetry, self-edge,
 ### Consequences
 
 All clients receive the same integrity guarantees, including import and future worker paths. Domain services should still pre-validate for readable errors, while PostgreSQL remains the final authority. Database integration tests deliberately race opposing writes.
+
+---
+
+## ADR-006 — Migration-bound concept embedding profile
+
+**Status:** Accepted
+
+**Date:** 2026-07-10
+
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+pgvector columns and indexes require a stable dimension, while provider models and dimensions can change. Milestone 3 must remain deterministic without live provider credentials, and source-segment embeddings do not exist until deterministic source ingestion in Milestone 5.
+
+### Decision
+
+The Milestone 3 concept embedding column is `vector(1536)`, tied to migration `0003_milestone_3_search_graph.sql`. The default profile uses the deterministic mock embedding client and stores its profile ID with each vector. A different dimension requires a new column/index migration and an explicit re-embedding job. Exact vector search is used at the current small atlas scale; an HNSW index is deferred until realistic data and profiling demonstrate a benefit. Search retains a typed source-result channel but returns it empty until immutable source/version/segment records exist.
+
+### Alternatives considered
+
+- Dimensionless vectors — rejected because indexed rows would still need dimension-specific expression indexes and profile filtering.
+- An HNSW index on the empty seed atlas — rejected because it adds operational cost before there is data to benchmark.
+- Creating source tables early only to make search return placeholders — rejected because source immutability and ingestion belong to Milestone 5.
+
+### Consequences
+
+Concept authoring refreshes derived mock embeddings without changing canonical revisions. Search can combine lexical and semantic concept channels now without presenting synthesis as primary-source evidence. Live embedding adoption must include a migration/re-embedding plan rather than an environment-only dimension change.
+
+### Validation or reversal trigger
+
+Revisit exact vector search when the realistic performance fixture or production telemetry shows it cannot meet the one-second search target.

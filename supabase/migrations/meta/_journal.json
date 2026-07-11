@@ -15,6 +15,13 @@
       "when": 1783702007521,
       "tag": "0001_gifted_psynapse",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783706292853,
+      "tag": "0003_milestone_3_search_graph",
+      "breakpoints": true
     }
   ]
 }

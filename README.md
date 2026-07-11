@@ -89,7 +89,7 @@ The v0.1 product is complete when an authenticated owner can:
 
 ## Repository status
 
-Milestone 2 adds the reading-first world, domain, and concept experience; structured concept and relation authoring; Markdown synthesis; immutable concept revisions; accessible relationship and history views; and transactional audit-backed mutations. Graph visualization, hybrid retrieval, source ingestion, and live AI remain intentionally deferred to later milestones.
+Milestone 3 adds bounded local concept graphs, deterministic ELK layouts, relationship filters and depth controls, an equivalent accessible graph list, PostgreSQL full-text and vector search, reciprocal-rank hybrid retrieval, explainable match reasons, and the global `Cmd/Ctrl + K` command palette. Source ingestion, learning paths, and live AI remain intentionally deferred to later milestones.
 
 ## Prerequisites
 
@@ -130,7 +130,7 @@ Health endpoints:
 - web: `http://127.0.0.1:3000/api/health`
 - worker: `http://127.0.0.1:8091/healthz`
 
-The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 2.
+The default `AI_PROVIDER=mock` requires no OpenAI key. Live provider behavior is not present in Milestone 3.
 
 ## Verification
 

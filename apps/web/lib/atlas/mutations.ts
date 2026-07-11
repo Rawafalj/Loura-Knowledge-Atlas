@@ -2,6 +2,11 @@ import { z } from "zod";
 
 import type { Json } from "@/lib/supabase/database.types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  conceptEmbeddingText,
+  getEmbeddingProfile,
+  vectorToLiteral,
+} from "@/lib/search/embeddings";
 
 import type {
   CreateConceptInput,
@@ -52,6 +57,30 @@ function messageForDatabaseCode(code: string): string {
   return "The atlas change could not be saved.";
 }
 
+async function refreshConceptEmbedding(
+  workspaceId: string,
+  conceptId: string,
+  input: CreateConceptInput | UpdateConceptInput,
+): Promise<boolean> {
+  try {
+    const profile = getEmbeddingProfile();
+    const [embedding] = await profile.client.embed([
+      conceptEmbeddingText(input),
+    ]);
+    if (!embedding) return false;
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.rpc("set_concept_embedding", {
+      p_workspace_id: workspaceId,
+      p_concept_id: conceptId,
+      p_embedding: vectorToLiteral(embedding, profile.dimensions),
+      p_embedding_model: profile.model,
+    });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 export async function createConcept(
   workspaceId: string,
   input: CreateConceptInput,
@@ -68,7 +97,13 @@ export async function createConcept(
       error.code,
       messageForDatabaseCode(error.code),
     );
-  return conceptMutationResultSchema.parse(data);
+  const result = conceptMutationResultSchema.parse(data);
+  const searchIndexed = await refreshConceptEmbedding(
+    workspaceId,
+    result.id,
+    input,
+  );
+  return { ...result, searchIndexed };
 }
 
 export async function updateConcept(
@@ -89,7 +124,13 @@ export async function updateConcept(
       error.code,
       messageForDatabaseCode(error.code),
     );
-  return conceptMutationResultSchema.parse(data);
+  const result = conceptMutationResultSchema.parse(data);
+  const searchIndexed = await refreshConceptEmbedding(
+    workspaceId,
+    result.id,
+    input,
+  );
+  return { ...result, searchIndexed };
 }
 
 export async function createRelation(

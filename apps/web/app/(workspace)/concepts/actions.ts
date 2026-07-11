@@ -88,7 +88,9 @@ export async function createConceptAction(
     revalidatePath(`/concepts/${result.slug}`);
     return {
       status: "success",
-      message: "Concept created.",
+      message: result.searchIndexed
+        ? "Concept created."
+        : "Concept created; semantic indexing is pending.",
       route: `/concepts/${result.slug}`,
     };
   } catch (error) {
@@ -112,7 +114,9 @@ export async function updateConceptAction(
     revalidatePath(`/concepts/${result.slug}`);
     return {
       status: "success",
-      message: "Concept and revision saved.",
+      message: result.searchIndexed
+        ? "Concept and revision saved."
+        : "Concept saved; semantic indexing is pending.",
       route: `/concepts/${result.slug}`,
     };
   } catch (error) {
