@@ -85,12 +85,44 @@ export async function retrieveAskEvidence(
       ? scopedConceptIds
       : search.concepts.map((concept) => concept.id)
   ).slice(0, 12);
-  const conceptRows = conceptIds.length
+  const relationRows = conceptIds.length
+    ? await Promise.all([
+        supabase
+          .from("concept_relations")
+          .select("source_concept_id, target_concept_id")
+          .eq("workspace_id", workspaceId)
+          .in("source_concept_id", conceptIds)
+          .is("deleted_at", null)
+          .limit(24),
+        supabase
+          .from("concept_relations")
+          .select("source_concept_id, target_concept_id")
+          .eq("workspace_id", workspaceId)
+          .in("target_concept_id", conceptIds)
+          .is("deleted_at", null)
+          .limit(24),
+      ])
+    : [];
+  if (relationRows.some((result) => result.error))
+    throw new AskServiceError(
+      "INTERNAL_ERROR",
+      "Unable to load related concepts.",
+    );
+  const graphConceptIds = relationRows.flatMap((result) =>
+    (result.data ?? []).flatMap((relation) => [
+      relation.source_concept_id,
+      relation.target_concept_id,
+    ]),
+  );
+  const retrievedConceptIds = [
+    ...new Set([...conceptIds, ...graphConceptIds]),
+  ].slice(0, 20);
+  const conceptRows = retrievedConceptIds.length
     ? await supabase
         .from("concepts")
         .select("id, canonical_name, synthesis_markdown, content_status")
         .eq("workspace_id", workspaceId)
-        .in("id", conceptIds)
+        .in("id", retrievedConceptIds)
     : { data: [], error: null };
   if (conceptRows.error)
     throw new AskServiceError(
@@ -180,7 +212,10 @@ export async function retrieveAskEvidence(
       },
     ];
   });
-  return { bundle: buildEvidenceBundle({ segments, concepts }), conceptIds };
+  return {
+    bundle: buildEvidenceBundle({ segments, concepts }),
+    conceptIds: retrievedConceptIds,
+  };
 }
 
 export async function generateMockAskAnswer(
