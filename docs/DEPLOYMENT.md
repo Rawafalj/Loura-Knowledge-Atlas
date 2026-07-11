@@ -20,7 +20,7 @@ The repository also includes `apps/web/Dockerfile`, `services/ingest-worker/Dock
 6. Deploy the worker with `WORKER_PROCESS_JOBS=false`, verify `/healthz`, then enable processing after queue and storage checks pass.
 7. Check CSP/security headers, queue metrics, ingestion duration/failure counts, search latency, and Ask Atlas citation integrity.
 
-For a container host, run `docker compose -f docker-compose.production.yml up -d --build`, then verify `http://127.0.0.1:3000/api/health` and `http://127.0.0.1:8091/healthz` through the host's private network or reverse proxy.
+For a container host, run `docker compose --env-file .env.production -f docker-compose.production.yml up -d --build`, then verify `http://127.0.0.1:3000/api/health` and `http://127.0.0.1:8091/healthz` through the host's private network or reverse proxy. The web service receives only public Supabase settings; the worker receives the service-role and database settings.
 
 ## Rollback
 
