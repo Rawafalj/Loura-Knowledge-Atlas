@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import signal
 import threading
+from datetime import UTC, datetime
 from types import FrameType
 
 from loura_ingest_worker.config import WorkerConfig
@@ -46,14 +47,19 @@ def main() -> None:
         while not stopping.is_set():
             try:
                 claimed = consumer.read_one()
+                server.metrics.polls += 1
                 if claimed is None:
                     stopping.wait(config.queue_poll_seconds)
                     continue
+                server.metrics.claimed += 1
                 if pipeline.process(claimed):
                     consumer.archive(claimed.message_id)
+                    server.metrics.completed += 1
             except Exception:
                 # Never emit raw database, source, parser, or credential-bearing errors.
                 print("Source ingestion iteration failed; the durable message remains retryable")
+                server.metrics.failed += 1
+                server.metrics.last_error_at = datetime.now(UTC).isoformat()
                 stopping.wait(config.queue_poll_seconds)
     finally:
         server.shutdown()

@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { consumeRateLimit } from "@/lib/security/rate-limit";
 
 export type LoginState = { status: "idle" | "sent" | "error"; message: string };
 
@@ -15,6 +16,16 @@ export async function requestMagicLink(
   const parsed = loginSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success)
     return { status: "error", message: "Enter a valid email address." };
+  const rate = consumeRateLimit(
+    `login:${parsed.data.email.toLowerCase()}`,
+    5,
+    10 * 60_000,
+  );
+  if (!rate.allowed)
+    return {
+      status: "error",
+      message: "Too many sign-in attempts. Try again later.",
+    };
 
   const origin = process.env.NEXT_PUBLIC_APP_URL;
   if (!origin)

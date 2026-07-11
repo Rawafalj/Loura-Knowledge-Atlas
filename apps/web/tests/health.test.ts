@@ -10,7 +10,7 @@ describe("web health route", () => {
     await expect(response.json()).resolves.toEqual({
       service: "web",
       status: "ok",
-      milestone: 0,
+      milestone: 9,
     });
   });
 });

@@ -27,6 +27,8 @@
     "worker:lint": "uv run --project services/ingest-worker ruff check services/ingest-worker",
     "worker:typecheck": "uv run --project services/ingest-worker mypy services/ingest-worker/src",
     "seed:validate": "tsx scripts/validate-atlas.ts seed/atlas.yaml",
+    "citation:check": "pnpm --filter @loura/web exec tsx scripts/check-citation-integrity.ts",
+    "eval:golden": "pnpm --filter @loura/web exec tsx scripts/run-golden-evals.ts",
     "verify": "pnpm seed:validate && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm worker:test && pnpm build"
   },
   "devDependencies": {

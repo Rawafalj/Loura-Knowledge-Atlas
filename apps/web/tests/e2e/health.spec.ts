@@ -7,5 +7,10 @@ test("web health endpoint is available", async ({ request }) => {
   await expect(response.json()).resolves.toMatchObject({
     status: "ok",
     service: "web",
+    milestone: 9,
   });
+  expect(response.headers()["content-security-policy"]).toContain(
+    "frame-ancestors 'none'",
+  );
+  expect(response.headers()["x-content-type-options"]).toBe("nosniff");
 });

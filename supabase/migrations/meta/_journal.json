@@ -50,6 +50,13 @@
       "when": 1783796564260,
       "tag": "0007_milestone_7_ask_atlas",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783802270493,
+      "tag": "0008_milestone_8_loura_applications",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { searchRequestSchema } from "@/lib/search/contracts";
 import { searchAtlas } from "@/lib/search/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { checkRequestRateLimit } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,15 @@ function apiError(
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
+  const rate = checkRequestRateLimit(request, "search", 60, 60_000);
+  if (!rate.allowed) {
+    return apiError(
+      429,
+      "RATE_LIMITED",
+      "Search is temporarily rate limited. Try again shortly.",
+      requestId,
+    );
+  }
   const payload: unknown = await request.json().catch(() => null);
   const parsed = searchRequestSchema.safeParse(payload);
   if (!parsed.success) {

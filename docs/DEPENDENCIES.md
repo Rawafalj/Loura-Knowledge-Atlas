@@ -1,4 +1,4 @@
-# Dependency Inventory through Milestone 5
+# Dependency Inventory through Milestone 9
 
 Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockfiles.
 
@@ -57,7 +57,7 @@ The worker health endpoint uses the Python standard library and imports Docling 
 
 TypeScript 7.0.2 and ESLint 10.6.0 were current but are not yet supported by the parser/plugins bundled with `eslint-config-next` 16.2.10. TypeScript 6.0.3 and ESLint 9.39.4 are therefore the newest compatible stable releases and remain pinned until the Next.js lint stack supports the newer majors.
 
-CI runs production dependency auditing and Dependabot tracks npm, Python, and GitHub Actions updates. A complete transitive license report is generated before the v0.1 release gate.
+CI runs production dependency auditing and Dependabot tracks npm, Python, and GitHub Actions updates. A complete transitive license report is generated before the v0.1 release gate; dependency changes must update this inventory and the lockfiles together.
 
 CI action releases were also checked on 2026-07-10 and pinned exactly: checkout 7.0.0, setup-node 6.4.0, setup-python 6.3.0, pnpm/action-setup 6.0.9, setup-uv 8.3.2, and gitleaks-action 3.0.0.
 

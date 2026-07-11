@@ -89,7 +89,7 @@ The v0.1 product is complete when an authenticated owner can:
 
 ## Repository status
 
-Milestone 5 adds a private source library, immutable parser-versioned source versions and structural segments, explicit file and SSRF-safe URL submission, durable `pgmq` jobs, deterministic Docling parsing, progress/retry views, and source-aware lexical search. AI extraction and live model calls remain intentionally deferred to Milestone 6.
+Milestones 5–8 add deterministic private ingestion, reviewed AI proposals, grounded Ask Atlas answers, and the separate Loura application bridge. Milestone 9 adds release hardening: security headers/CSP, bounded rate limits, redacted telemetry boundaries, queue metrics, citation/golden-eval gates, and backup/deployment runbooks. Live model calls and external analytics remain opt-in.
 
 ## Prerequisites
 

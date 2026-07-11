@@ -6,6 +6,6 @@ export function GET() {
   return NextResponse.json({
     service: "web",
     status: "ok",
-    milestone: 0,
+    milestone: 9,
   });
 }

@@ -8,6 +8,8 @@ import {
   retrieveAskEvidence,
 } from "@/lib/ask/service";
 import { askRequestSchema } from "@/lib/ask/contracts";
+import { checkRequestRateLimit } from "@/lib/security/rate-limit";
+import { trackProductEvent } from "@/lib/observability/telemetry";
 
 export const runtime = "nodejs";
 
@@ -17,6 +19,22 @@ function event(type: string, data: unknown) {
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
+  const rate = checkRequestRateLimit(request, "ask", 20, 60_000);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "RATE_LIMITED",
+          message: "Ask Atlas is temporarily rate limited. Try again shortly.",
+          requestId,
+        },
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      },
+    );
+  }
   const parsed = askRequestSchema.safeParse(
     await request.json().catch(() => null),
   );
@@ -108,6 +126,11 @@ export async function POST(request: Request) {
           conceptIds: answer.conceptIds,
           citationIds: answer.citationIds,
           scope: parsed.data.scope,
+        });
+        trackProductEvent("ask.completed", {
+          workspaceId: parsed.data.workspaceId,
+          citationCount: answer.citationIds.length,
+          evidenceAssessment: answer.evidenceAssessment,
         });
         send("answer.completed", { threadId, answer });
         controller.close();

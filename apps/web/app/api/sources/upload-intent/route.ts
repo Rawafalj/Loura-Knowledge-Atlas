@@ -5,6 +5,7 @@ import { sourceApiError } from "@/lib/sources/api";
 import { authorizeSourceMutation } from "@/lib/sources/auth";
 import { uploadIntentSchema } from "@/lib/sources/contracts";
 import { validateSourceFile } from "@/lib/sources/file-policy";
+import { checkRequestRateLimit } from "@/lib/security/rate-limit";
 
 const createdSourceSchema = z.object({
   sourceId: z.uuid(),
@@ -13,6 +14,14 @@ const createdSourceSchema = z.object({
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
+  const rate = checkRequestRateLimit(request, "source-upload", 20, 60_000);
+  if (!rate.allowed)
+    return sourceApiError(
+      429,
+      "RATE_LIMITED",
+      "Uploads are temporarily rate limited.",
+      requestId,
+    );
   const payload: unknown = await request.json().catch(() => null);
   const parsed = uploadIntentSchema.safeParse(payload);
   if (!parsed.success) {

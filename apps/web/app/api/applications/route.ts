@@ -8,6 +8,7 @@ import {
   applicationTypes,
 } from "@/lib/applications/contracts";
 import { authorizeSourceMutation } from "@/lib/sources/auth";
+import { checkRequestRateLimit } from "@/lib/security/rate-limit";
 
 const topLevelRequestSchema = z.object({
   workspaceId: z.uuid(),
@@ -28,6 +29,22 @@ const requestSchema = z.union([
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
+  const rate = checkRequestRateLimit(request, "application-write", 30, 60_000);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "RATE_LIMITED",
+          message: "Application changes are temporarily rate limited.",
+          requestId,
+        },
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      },
+    );
+  }
   const parsed = requestSchema.safeParse(
     await request.json().catch(() => null),
   );

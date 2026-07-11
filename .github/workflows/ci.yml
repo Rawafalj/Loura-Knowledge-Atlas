@@ -33,6 +33,8 @@ jobs:
       - run: uv sync --project services/ingest-worker --frozen
       - run: pnpm db:generate
       - run: git diff --exit-code -- supabase/migrations
+      - run: pnpm citation:check
+      - run: pnpm eval:golden
       - run: pnpm verify
 
   database:

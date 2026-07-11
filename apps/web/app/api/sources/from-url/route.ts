@@ -5,6 +5,7 @@ import { sourceApiError } from "@/lib/sources/api";
 import { authorizeSourceMutation } from "@/lib/sources/auth";
 import { urlSourceSchema } from "@/lib/sources/contracts";
 import { assertSafeSourceUrl } from "@/lib/sources/url-safety";
+import { checkRequestRateLimit } from "@/lib/security/rate-limit";
 
 const createdUrlSourceSchema = z.object({
   sourceId: z.uuid(),
@@ -14,6 +15,14 @@ const createdUrlSourceSchema = z.object({
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
+  const rate = checkRequestRateLimit(request, "source-url", 10, 60_000);
+  if (!rate.allowed)
+    return sourceApiError(
+      429,
+      "RATE_LIMITED",
+      "URL ingestion is temporarily rate limited.",
+      requestId,
+    );
   const payload: unknown = await request.json().catch(() => null);
   const parsed = urlSourceSchema.safeParse(payload);
   if (!parsed.success) {

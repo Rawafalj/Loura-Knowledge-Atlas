@@ -4,6 +4,7 @@ import { z } from "zod";
 import { sourceApiError } from "@/lib/sources/api";
 import { authorizeSourceMutation } from "@/lib/sources/auth";
 import { createMockProposalForSource } from "@/lib/proposals/service";
+import { checkRequestRateLimit } from "@/lib/security/rate-limit";
 
 const requestSchema = z.object({ workspaceId: z.uuid() });
 
@@ -12,6 +13,15 @@ export async function POST(
   context: { params: Promise<{ sourceId: string }> },
 ) {
   const requestId = crypto.randomUUID();
+  const rate = checkRequestRateLimit(request, "source-extraction", 10, 60_000);
+  if (!rate.allowed) {
+    return sourceApiError(
+      429,
+      "RATE_LIMITED",
+      "Extraction proposals are temporarily rate limited.",
+      requestId,
+    );
+  }
   const parsed = requestSchema.safeParse(
     await request.json().catch(() => null),
   );
