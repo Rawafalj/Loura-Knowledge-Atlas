@@ -510,6 +510,7 @@ Constraint: unique `(workspace_id, user_id, concept_id)`.
 | model_id | text | |
 | prompt_version | text | |
 | schema_version | text | nullable |
+| idempotency_key | text | unique within workspace; retries reuse the same run |
 | input_refs | jsonb | IDs only; avoid raw confidential text |
 | output_hash | text | nullable |
 | usage | jsonb | nullable |
@@ -692,4 +693,3 @@ A citation is valid only when:
 - AI answers only cite segment IDs included in the generation context.
 
 Create a `scripts/check-citations.ts` command that reports broken or orphaned citations and exits non-zero in CI for seed data.
-

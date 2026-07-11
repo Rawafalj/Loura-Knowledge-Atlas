@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Badge, Card, PageHeader } from "@loura/ui";
 
 import { JobProgress } from "@/components/sources/job-progress";
+import { GenerateProposalButton } from "@/components/proposals/generate-proposal-button";
 import { requireWorkspaceMembership } from "@/lib/auth/session";
 import { getSourceDetail } from "@/lib/sources/service";
 
@@ -38,6 +39,12 @@ export default async function SourceDetailPage({
             <Badge>{detail.source.source_type}</Badge>
             <Badge>{detail.source.quality}</Badge>
             <Badge>{detail.source.sensitivity}</Badge>
+            {membership.role !== "viewer" ? (
+              <GenerateProposalButton
+                sourceId={detail.source.id}
+                workspaceId={membership.workspaceId}
+              />
+            ) : null}
           </div>
         }
       />

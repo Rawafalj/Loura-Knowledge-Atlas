@@ -20,8 +20,16 @@ class MockStructuredModelClient:
     def __init__(self, fixture: dict[str, Any]) -> None:
         self._fixture = fixture
 
-    def generate(self, output_type: type[OutputT], input_text: str) -> OutputT:
-        del input_text
+    def generate(
+        self,
+        output_type: type[OutputT],
+        input_text: str = "",
+        *,
+        prompt: str | None = None,
+    ) -> OutputT:
+        # ``prompt`` is accepted as the provider-compatible spelling while
+        # preserving the original positional test/client API.
+        del input_text, prompt
         return output_type.model_validate(self._fixture)
 
 

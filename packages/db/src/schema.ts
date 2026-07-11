@@ -167,6 +167,49 @@ export const ingestionStage = pgEnum("ingestion_stage", [
   "persist",
   "segment",
 ]);
+export const aiRunType = pgEnum("ai_run_type", [
+  "source_summary",
+  "extraction",
+  "resolution",
+  "synthesis",
+  "ask",
+  "assessment",
+]);
+export const aiRunStatus = pgEnum("ai_run_status", [
+  "queued",
+  "running",
+  "completed",
+  "failed",
+  "cancelled",
+]);
+export const proposalStatus = pgEnum("proposal_status", [
+  "draft",
+  "ready_for_review",
+  "partially_reviewed",
+  "accepted",
+  "rejected",
+  "mixed",
+  "archived",
+]);
+export const proposalItemType = pgEnum("proposal_item_type", [
+  "create_concept",
+  "update_concept",
+  "add_alias",
+  "add_relation",
+  "add_prerequisite",
+  "add_claim",
+  "add_citation",
+  "mark_contradiction",
+  "add_application",
+]);
+export const proposalItemStatus = pgEnum("proposal_item_status", [
+  "pending",
+  "accepted",
+  "edited_and_accepted",
+  "rejected",
+  "deferred",
+  "stale",
+]);
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1108,6 +1151,159 @@ export const ingestionJobs = pgTable(
     check(
       "ingestion_jobs_progress_check",
       sql`${table.progress} between 0 and 100`,
+    ),
+  ],
+);
+
+export const aiRuns = pgTable(
+  "ai_runs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    runType: aiRunType("run_type").notNull(),
+    status: aiRunStatus("status").notNull().default("queued"),
+    provider: text("provider").notNull(),
+    modelId: text("model_id").notNull(),
+    promptVersion: text("prompt_version").notNull(),
+    schemaVersion: text("schema_version"),
+    idempotencyKey: text("idempotency_key").notNull(),
+    inputRefs: jsonb("input_refs").notNull().default({}),
+    outputHash: text("output_hash"),
+    usage: jsonb("usage"),
+    latencyMs: integer("latency_ms"),
+    traceId: text("trace_id"),
+    errorCode: text("error_code"),
+    errorMessageSanitized: text("error_message_sanitized"),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdBy: uuid("created_by").references(() => profiles.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("ai_runs_id_workspace_unique").on(table.id, table.workspaceId),
+    unique("ai_runs_workspace_idempotency_unique").on(
+      table.workspaceId,
+      table.idempotencyKey,
+    ),
+    index("ai_runs_workspace_created_idx").on(
+      table.workspaceId,
+      table.createdAt,
+    ),
+    index("ai_runs_workspace_status_idx").on(table.workspaceId, table.status),
+    check(
+      "ai_runs_latency_check",
+      sql`${table.latencyMs} is null or ${table.latencyMs} >= 0`,
+    ),
+  ],
+);
+
+export const changeProposals = pgTable(
+  "change_proposals",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    sourceVersionId: uuid("source_version_id"),
+    aiRunId: uuid("ai_run_id"),
+    title: text("title").notNull(),
+    status: proposalStatus("status").notNull().default("draft"),
+    summary: text("summary"),
+    createdBy: uuid("created_by").references(() => profiles.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("change_proposals_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    uniqueIndex("change_proposals_workspace_run_unique")
+      .on(table.workspaceId, table.aiRunId)
+      .where(sql`${table.aiRunId} is not null`),
+    index("change_proposals_workspace_status_idx").on(
+      table.workspaceId,
+      table.status,
+      table.updatedAt,
+    ),
+    foreignKey({
+      name: "change_proposals_source_version_workspace_fk",
+      columns: [table.sourceVersionId, table.workspaceId],
+      foreignColumns: [sourceVersions.id, sourceVersions.workspaceId],
+    }),
+    foreignKey({
+      name: "change_proposals_ai_run_workspace_fk",
+      columns: [table.aiRunId, table.workspaceId],
+      foreignColumns: [aiRuns.id, aiRuns.workspaceId],
+    }),
+    check(
+      "change_proposals_title_check",
+      sql`length(trim(${table.title})) > 0`,
+    ),
+  ],
+);
+
+export const changeProposalItems = pgTable(
+  "change_proposal_items",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    proposalId: uuid("proposal_id").notNull(),
+    itemType: proposalItemType("item_type").notNull(),
+    targetType: text("target_type"),
+    targetId: uuid("target_id"),
+    baseRevisionId: uuid("base_revision_id"),
+    proposedPayload: jsonb("proposed_payload").notNull(),
+    evidenceSegmentIds: uuid("evidence_segment_ids")
+      .array()
+      .notNull()
+      .default(sql`'{}'::uuid[]`),
+    confidence: numeric("confidence", { precision: 4, scale: 3 }),
+    rationale: text("rationale"),
+    status: proposalItemStatus("status").notNull().default("pending"),
+    rejectionReason: text("rejection_reason"),
+    editedPayload: jsonb("edited_payload"),
+    reviewedBy: uuid("reviewed_by").references(() => profiles.id),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    appliedObjectRefs: jsonb("applied_object_refs"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("change_proposal_items_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    foreignKey({
+      name: "change_proposal_items_proposal_workspace_fk",
+      columns: [table.proposalId, table.workspaceId],
+      foreignColumns: [changeProposals.id, changeProposals.workspaceId],
+    }).onDelete("cascade"),
+    index("change_proposal_items_proposal_status_idx").on(
+      table.workspaceId,
+      table.proposalId,
+      table.status,
+    ),
+    check(
+      "change_proposal_items_confidence_check",
+      sql`${table.confidence} between 0 and 1`,
+    ),
+    check(
+      "change_proposal_items_payload_check",
+      sql`jsonb_typeof(${table.proposedPayload}) = 'object'`,
     ),
   ],
 );

@@ -85,6 +85,10 @@ class ParsedDocument(BaseModel):
 class SourceSegment(BaseModel):
     model_config = ConfigDict(frozen=True)
 
+    # Database-backed segments have a deterministic UUID citation ID. Parser
+    # output is created before persistence and may leave this unset; in that
+    # case ``stable_key`` is used as the proposal evidence handle.
+    id: UUID | None = None
     ordinal: int = Field(ge=1)
     stable_key: str = Field(pattern=r"^[0-9a-f]{32}$")
     segment_type: str

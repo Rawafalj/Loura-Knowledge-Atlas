@@ -54,6 +54,9 @@ export function WorkspaceShell({
           <Link href="/sources" className="nav-link">
             Sources
           </Link>
+          <Link href="/review" className="nav-link">
+            Review queue
+          </Link>
           <p className="nav-label">Later milestones</p>
           <span className="nav-link nav-link--disabled">Ask Atlas</span>
         </nav>

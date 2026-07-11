@@ -7,8 +7,117 @@ export type Json =
   | Json[];
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
+      ai_runs: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          error_code: string | null;
+          error_message_sanitized: string | null;
+          id: string;
+          idempotency_key: string;
+          input_refs: Json;
+          latency_ms: number | null;
+          model_id: string;
+          output_hash: string | null;
+          prompt_version: string;
+          provider: string;
+          run_type: Database["public"]["Enums"]["ai_run_type"];
+          schema_version: string | null;
+          started_at: string;
+          status: Database["public"]["Enums"]["ai_run_status"];
+          trace_id: string | null;
+          usage: Json | null;
+          workspace_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          error_code?: string | null;
+          error_message_sanitized?: string | null;
+          id?: string;
+          idempotency_key: string;
+          input_refs?: Json;
+          latency_ms?: number | null;
+          model_id: string;
+          output_hash?: string | null;
+          prompt_version: string;
+          provider: string;
+          run_type: Database["public"]["Enums"]["ai_run_type"];
+          schema_version?: string | null;
+          started_at?: string;
+          status?: Database["public"]["Enums"]["ai_run_status"];
+          trace_id?: string | null;
+          usage?: Json | null;
+          workspace_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          error_code?: string | null;
+          error_message_sanitized?: string | null;
+          id?: string;
+          idempotency_key?: string;
+          input_refs?: Json;
+          latency_ms?: number | null;
+          model_id?: string;
+          output_hash?: string | null;
+          prompt_version?: string;
+          provider?: string;
+          run_type?: Database["public"]["Enums"]["ai_run_type"];
+          schema_version?: string | null;
+          started_at?: string;
+          status?: Database["public"]["Enums"]["ai_run_status"];
+          trace_id?: string | null;
+          usage?: Json | null;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_runs_created_by_profiles_id_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ai_runs_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_events: {
         Row: {
           actor_type: Database["public"]["Enums"]["audit_actor_type"];
@@ -72,6 +181,159 @@ export type Database = {
           },
           {
             foreignKeyName: "audit_events_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      change_proposal_items: {
+        Row: {
+          applied_object_refs: Json | null;
+          base_revision_id: string | null;
+          confidence: number | null;
+          created_at: string;
+          edited_payload: Json | null;
+          evidence_segment_ids: string[];
+          id: string;
+          item_type: Database["public"]["Enums"]["proposal_item_type"];
+          proposal_id: string;
+          proposed_payload: Json;
+          rationale: string | null;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: Database["public"]["Enums"]["proposal_item_status"];
+          target_id: string | null;
+          target_type: string | null;
+          workspace_id: string;
+        };
+        Insert: {
+          applied_object_refs?: Json | null;
+          base_revision_id?: string | null;
+          confidence?: number | null;
+          created_at?: string;
+          edited_payload?: Json | null;
+          evidence_segment_ids?: string[];
+          id?: string;
+          item_type: Database["public"]["Enums"]["proposal_item_type"];
+          proposal_id: string;
+          proposed_payload: Json;
+          rationale?: string | null;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["proposal_item_status"];
+          target_id?: string | null;
+          target_type?: string | null;
+          workspace_id: string;
+        };
+        Update: {
+          applied_object_refs?: Json | null;
+          base_revision_id?: string | null;
+          confidence?: number | null;
+          created_at?: string;
+          edited_payload?: Json | null;
+          evidence_segment_ids?: string[];
+          id?: string;
+          item_type?: Database["public"]["Enums"]["proposal_item_type"];
+          proposal_id?: string;
+          proposed_payload?: Json;
+          rationale?: string | null;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: Database["public"]["Enums"]["proposal_item_status"];
+          target_id?: string | null;
+          target_type?: string | null;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "change_proposal_items_proposal_workspace_fk";
+            columns: ["proposal_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "change_proposals";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "change_proposal_items_reviewed_by_profiles_id_fk";
+            columns: ["reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "change_proposal_items_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      change_proposals: {
+        Row: {
+          ai_run_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          source_version_id: string | null;
+          status: Database["public"]["Enums"]["proposal_status"];
+          summary: string | null;
+          title: string;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          ai_run_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          source_version_id?: string | null;
+          status?: Database["public"]["Enums"]["proposal_status"];
+          summary?: string | null;
+          title: string;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          ai_run_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          source_version_id?: string | null;
+          status?: Database["public"]["Enums"]["proposal_status"];
+          summary?: string | null;
+          title?: string;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "change_proposals_ai_run_workspace_fk";
+            columns: ["ai_run_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "ai_runs";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "change_proposals_created_by_profiles_id_fk";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "change_proposals_source_version_workspace_fk";
+            columns: ["source_version_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "source_versions";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "change_proposals_workspace_id_workspaces_id_fk";
             columns: ["workspace_id"];
             isOneToOne: false;
             referencedRelation: "workspaces";
@@ -1564,6 +1826,17 @@ export type Database = {
         Args: { p_job_id: string; p_workspace_id: string };
         Returns: Json;
       };
+      review_change_proposal_item: {
+        Args: {
+          p_action: string;
+          p_edited_payload?: Json;
+          p_item_id: string;
+          p_proposal_id: string;
+          p_reason?: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
       search_concepts_lexical: {
         Args: {
           p_content_statuses?: Database["public"]["Enums"]["content_status"][];
@@ -1680,6 +1953,15 @@ export type Database = {
       };
     };
     Enums: {
+      ai_run_status:
+        "queued" | "running" | "completed" | "failed" | "cancelled";
+      ai_run_type:
+        | "source_summary"
+        | "extraction"
+        | "resolution"
+        | "synthesis"
+        | "ask"
+        | "assessment";
       alias_type:
         | "synonym"
         | "abbreviation"
@@ -1712,6 +1994,31 @@ export type Database = {
         | "external_evaluation";
       mastery_status:
         "not_started" | "learning" | "applied" | "mastered" | "revisit";
+      proposal_item_status:
+        | "pending"
+        | "accepted"
+        | "edited_and_accepted"
+        | "rejected"
+        | "deferred"
+        | "stale";
+      proposal_item_type:
+        | "create_concept"
+        | "update_concept"
+        | "add_alias"
+        | "add_relation"
+        | "add_prerequisite"
+        | "add_claim"
+        | "add_citation"
+        | "mark_contradiction"
+        | "add_application";
+      proposal_status:
+        | "draft"
+        | "ready_for_review"
+        | "partially_reviewed"
+        | "accepted"
+        | "rejected"
+        | "mixed"
+        | "archived";
       relation_category:
         | "hierarchy"
         | "learning"
@@ -1884,8 +2191,20 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
+      ai_run_status: ["queued", "running", "completed", "failed", "cancelled"],
+      ai_run_type: [
+        "source_summary",
+        "extraction",
+        "resolution",
+        "synthesis",
+        "ask",
+        "assessment",
+      ],
       alias_type: [
         "synonym",
         "abbreviation",
@@ -1930,6 +2249,34 @@ export const Constants = {
         "applied",
         "mastered",
         "revisit",
+      ],
+      proposal_item_status: [
+        "pending",
+        "accepted",
+        "edited_and_accepted",
+        "rejected",
+        "deferred",
+        "stale",
+      ],
+      proposal_item_type: [
+        "create_concept",
+        "update_concept",
+        "add_alias",
+        "add_relation",
+        "add_prerequisite",
+        "add_claim",
+        "add_citation",
+        "mark_contradiction",
+        "add_application",
+      ],
+      proposal_status: [
+        "draft",
+        "ready_for_review",
+        "partially_reviewed",
+        "accepted",
+        "rejected",
+        "mixed",
+        "archived",
       ],
       relation_category: [
         "hierarchy",

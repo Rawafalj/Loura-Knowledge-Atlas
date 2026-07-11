@@ -1,0 +1,25 @@
+{
+  "documentAssessment": {
+    "relevanceToAtlas": "high",
+    "reason": "Contains operational guidance.",
+    "sourceLimitations": []
+  },
+  "concepts": [
+    {
+      "candidateKey": "idempotency",
+      "canonicalName": "Idempotency",
+      "aliases": ["idempotent operation"],
+      "proposedDomainSlug": "distributed-systems",
+      "conceptKind": "concept",
+      "conciseDefinition": "Safe repetition produces the same effect.",
+      "evidenceSegmentIds": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+      "confidence": 0.9,
+      "existingConceptCandidates": []
+    }
+  ],
+  "relations": [],
+  "claims": [],
+  "applications": [],
+  "unresolvedQuestions": [],
+  "warnings": []
+}
