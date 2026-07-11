@@ -49,7 +49,7 @@ CREATE TABLE "source_segments" (
 	"page_end" integer,
 	"provenance" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"search_document" tsvector GENERATED ALWAYS AS (setweight(to_tsvector('english', coalesce("text", '')), 'B')) STORED,
-	"embedding" vector(1536),
+	"embedding" extensions.vector(1536),
 	"embedding_model" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "source_segments_id_workspace_unique" UNIQUE("id","workspace_id"),
