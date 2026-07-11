@@ -118,6 +118,112 @@ export type Database = {
           },
         ];
       };
+      ask_messages: {
+        Row: {
+          ai_run_id: string | null;
+          answer_status: Database["public"]["Enums"]["ask_answer_status"];
+          cited_segment_ids: string[] | null;
+          content_markdown: string;
+          created_at: string;
+          id: string;
+          retrieved_concept_ids: string[] | null;
+          role: Database["public"]["Enums"]["ask_message_role"];
+          thread_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          ai_run_id?: string | null;
+          answer_status?: Database["public"]["Enums"]["ask_answer_status"];
+          cited_segment_ids?: string[] | null;
+          content_markdown: string;
+          created_at?: string;
+          id?: string;
+          retrieved_concept_ids?: string[] | null;
+          role: Database["public"]["Enums"]["ask_message_role"];
+          thread_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          ai_run_id?: string | null;
+          answer_status?: Database["public"]["Enums"]["ask_answer_status"];
+          cited_segment_ids?: string[] | null;
+          content_markdown?: string;
+          created_at?: string;
+          id?: string;
+          retrieved_concept_ids?: string[] | null;
+          role?: Database["public"]["Enums"]["ask_message_role"];
+          thread_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ask_messages_ai_run_workspace_fk";
+            columns: ["ai_run_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "ai_runs";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "ask_messages_thread_workspace_fk";
+            columns: ["thread_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "ask_threads";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "ask_messages_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ask_threads: {
+        Row: {
+          created_at: string;
+          id: string;
+          scope: Json;
+          title: string | null;
+          updated_at: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          scope?: Json;
+          title?: string | null;
+          updated_at?: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          scope?: Json;
+          title?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ask_threads_user_id_profiles_id_fk";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "ask_threads_workspace_id_workspaces_id_fk";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_events: {
         Row: {
           actor_type: Database["public"]["Enums"]["audit_actor_type"];
@@ -1968,6 +2074,8 @@ export type Database = {
         | "former_name"
         | "translation"
         | "common_misnomer";
+      ask_answer_status: "complete" | "insufficient_evidence" | "failed";
+      ask_message_role: "user" | "assistant";
       audit_actor_type: "user" | "worker" | "system";
       concept_kind:
         | "concept"
@@ -2212,6 +2320,8 @@ export const Constants = {
         "translation",
         "common_misnomer",
       ],
+      ask_answer_status: ["complete", "insufficient_evidence", "failed"],
+      ask_message_role: ["user", "assistant"],
       audit_actor_type: ["user", "worker", "system"],
       concept_kind: [
         "concept",

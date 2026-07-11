@@ -21,6 +21,23 @@ export class MockStructuredModelClient implements StructuredModelClient {
   }
 }
 
+/** Deterministic Ask Atlas fixture client; live providers are never required in CI. */
+export class MockAnswerModelClient implements StructuredModelClient {
+  public constructor(private readonly fixture: unknown) {}
+
+  public async generate<T>(
+    request: StructuredGenerationRequest<T>,
+  ): Promise<StructuredGenerationResult<T>> {
+    return {
+      data: request.schema.parse(this.fixture),
+      provider: "mock",
+      model: "deterministic-answer-fixture",
+    };
+  }
+}
+
+export { MockAnswerModelClient as MockAtlasAnswerClient };
+
 export class MockEmbeddingClient implements EmbeddingClient {
   public constructor(private readonly dimensions = 8) {}
 

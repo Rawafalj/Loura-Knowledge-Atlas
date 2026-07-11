@@ -58,7 +58,9 @@ export function WorkspaceShell({
             Review queue
           </Link>
           <p className="nav-label">Later milestones</p>
-          <span className="nav-link nav-link--disabled">Ask Atlas</span>
+          <Link href="/ask" className="nav-link">
+            Ask Atlas
+          </Link>
         </nav>
         <div className="sidebar-footer">
           <Badge tone="accent">{membership.role}</Badge>

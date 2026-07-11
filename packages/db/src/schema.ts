@@ -210,6 +210,12 @@ export const proposalItemStatus = pgEnum("proposal_item_status", [
   "deferred",
   "stale",
 ]);
+export const askMessageRole = pgEnum("ask_message_role", ["user", "assistant"]);
+export const askAnswerStatus = pgEnum("ask_answer_status", [
+  "complete",
+  "insufficient_evidence",
+  "failed",
+]);
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1304,6 +1310,78 @@ export const changeProposalItems = pgTable(
     check(
       "change_proposal_items_payload_check",
       sql`jsonb_typeof(${table.proposedPayload}) = 'object'`,
+    ),
+  ],
+);
+
+export const askThreads = pgTable(
+  "ask_threads",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    title: text("title"),
+    scope: jsonb("scope").notNull().default({}),
+    ...timestamps,
+  },
+  (table) => [
+    unique("ask_threads_id_workspace_unique").on(table.id, table.workspaceId),
+    index("ask_threads_workspace_user_updated_idx").on(
+      table.workspaceId,
+      table.userId,
+      table.updatedAt,
+    ),
+    check(
+      "ask_threads_scope_check",
+      sql`jsonb_typeof(${table.scope}) = 'object'`,
+    ),
+  ],
+);
+
+export const askMessages = pgTable(
+  "ask_messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    threadId: uuid("thread_id").notNull(),
+    role: askMessageRole("role").notNull(),
+    contentMarkdown: text("content_markdown").notNull(),
+    answerStatus: askAnswerStatus("answer_status")
+      .notNull()
+      .default("complete"),
+    retrievedConceptIds: uuid("retrieved_concept_ids").array(),
+    citedSegmentIds: uuid("cited_segment_ids").array(),
+    aiRunId: uuid("ai_run_id"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("ask_messages_id_workspace_unique").on(table.id, table.workspaceId),
+    foreignKey({
+      name: "ask_messages_thread_workspace_fk",
+      columns: [table.threadId, table.workspaceId],
+      foreignColumns: [askThreads.id, askThreads.workspaceId],
+    }).onDelete("cascade"),
+    foreignKey({
+      name: "ask_messages_ai_run_workspace_fk",
+      columns: [table.aiRunId, table.workspaceId],
+      foreignColumns: [aiRuns.id, aiRuns.workspaceId],
+    }),
+    index("ask_messages_workspace_thread_created_idx").on(
+      table.workspaceId,
+      table.threadId,
+      table.createdAt,
+    ),
+    check(
+      "ask_messages_content_check",
+      sql`length(trim(${table.contentMarkdown})) > 0`,
     ),
   ],
 );

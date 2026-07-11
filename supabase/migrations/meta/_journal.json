@@ -43,6 +43,13 @@
       "when": 1783790153942,
       "tag": "0006_milestone_6_ai_proposals",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783796564260,
+      "tag": "0007_milestone_7_ask_atlas",
+      "breakpoints": true
     }
   ]
 }

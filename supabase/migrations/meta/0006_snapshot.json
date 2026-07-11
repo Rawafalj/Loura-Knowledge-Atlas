@@ -1,6 +1,6 @@
 {
-  "id": "3e1711cc-0fcc-40de-9b4f-bc1ef71fdf31",
-  "prevId": "e8f87acd-b362-4dbf-878f-500b1702bd62",
+  "id": "cc62d1a6-1913-416c-9b97-674fcd7fd9cf",
+  "prevId": "3e1711cc-0fcc-40de-9b4f-bc1ef71fdf31",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -218,6 +218,268 @@
         "ai_runs_latency_check": {
           "name": "ai_runs_latency_check",
           "value": "\"ai_runs\".\"latency_ms\" is null or \"ai_runs\".\"latency_ms\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.ask_messages": {
+      "name": "ask_messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "workspace_id": {
+          "name": "workspace_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thread_id": {
+          "name": "thread_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "ask_message_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content_markdown": {
+          "name": "content_markdown",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "answer_status": {
+          "name": "answer_status",
+          "type": "ask_answer_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'complete'"
+        },
+        "retrieved_concept_ids": {
+          "name": "retrieved_concept_ids",
+          "type": "uuid[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cited_segment_ids": {
+          "name": "cited_segment_ids",
+          "type": "uuid[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ai_run_id": {
+          "name": "ai_run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ask_messages_workspace_thread_created_idx": {
+          "name": "ask_messages_workspace_thread_created_idx",
+          "columns": [
+            {
+              "expression": "workspace_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "thread_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ask_messages_workspace_id_workspaces_id_fk": {
+          "name": "ask_messages_workspace_id_workspaces_id_fk",
+          "tableFrom": "ask_messages",
+          "tableTo": "workspaces",
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ask_messages_thread_workspace_fk": {
+          "name": "ask_messages_thread_workspace_fk",
+          "tableFrom": "ask_messages",
+          "tableTo": "ask_threads",
+          "columnsFrom": ["thread_id", "workspace_id"],
+          "columnsTo": ["id", "workspace_id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ask_messages_ai_run_workspace_fk": {
+          "name": "ask_messages_ai_run_workspace_fk",
+          "tableFrom": "ask_messages",
+          "tableTo": "ai_runs",
+          "columnsFrom": ["ai_run_id", "workspace_id"],
+          "columnsTo": ["id", "workspace_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ask_messages_id_workspace_unique": {
+          "name": "ask_messages_id_workspace_unique",
+          "nullsNotDistinct": false,
+          "columns": ["id", "workspace_id"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "ask_messages_content_check": {
+          "name": "ask_messages_content_check",
+          "value": "length(trim(\"ask_messages\".\"content_markdown\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.ask_threads": {
+      "name": "ask_threads",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "workspace_id": {
+          "name": "workspace_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ask_threads_workspace_user_updated_idx": {
+          "name": "ask_threads_workspace_user_updated_idx",
+          "columns": [
+            {
+              "expression": "workspace_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ask_threads_workspace_id_workspaces_id_fk": {
+          "name": "ask_threads_workspace_id_workspaces_id_fk",
+          "tableFrom": "ask_threads",
+          "tableTo": "workspaces",
+          "columnsFrom": ["workspace_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ask_threads_user_id_profiles_id_fk": {
+          "name": "ask_threads_user_id_profiles_id_fk",
+          "tableFrom": "ask_threads",
+          "tableTo": "profiles",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ask_threads_id_workspace_unique": {
+          "name": "ask_threads_id_workspace_unique",
+          "nullsNotDistinct": false,
+          "columns": ["id", "workspace_id"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "ask_threads_scope_check": {
+          "name": "ask_threads_scope_check",
+          "value": "jsonb_typeof(\"ask_threads\".\"scope\") = 'object'"
         }
       },
       "isRLSEnabled": false
@@ -4056,6 +4318,16 @@
         "translation",
         "common_misnomer"
       ]
+    },
+    "public.ask_answer_status": {
+      "name": "ask_answer_status",
+      "schema": "public",
+      "values": ["complete", "insufficient_evidence", "failed"]
+    },
+    "public.ask_message_role": {
+      "name": "ask_message_role",
+      "schema": "public",
+      "values": ["user", "assistant"]
     },
     "public.audit_actor_type": {
       "name": "audit_actor_type",
