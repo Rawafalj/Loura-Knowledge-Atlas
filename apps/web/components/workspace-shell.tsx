@@ -57,6 +57,10 @@ export function WorkspaceShell({
           <Link href="/review" className="nav-link">
             Review queue
           </Link>
+          <p className="nav-label">Apply</p>
+          <Link href="/applications" className="nav-link">
+            Loura applications
+          </Link>
           <p className="nav-label">Later milestones</p>
           <Link href="/ask" className="nav-link">
             Ask Atlas

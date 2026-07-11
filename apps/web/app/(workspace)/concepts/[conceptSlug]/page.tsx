@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Badge, EmptyState, PageHeader } from "@loura/ui";
 
 import { ConceptGraph } from "@/components/graph/concept-graph";
+import { ConceptApplicationLinkForm } from "@/components/applications/concept-application-link-form";
 import { MasteryForm } from "@/components/learning/mastery-form";
 import { Markdown } from "@/components/markdown";
 import { RelationshipTable } from "@/components/relationship-table";
@@ -11,6 +12,10 @@ import { getConceptView } from "@/lib/atlas/queries";
 import { requireWorkspaceMembership } from "@/lib/auth/session";
 import { MASTERY_LEVEL_LABELS } from "@/lib/learning/contracts";
 import { getConceptMastery } from "@/lib/learning/service";
+import {
+  listApplications,
+  listApplicationsForConcept,
+} from "@/lib/applications/service";
 
 const tabs = [
   "overview",
@@ -66,6 +71,17 @@ export default async function ConceptPage({
     activeTab === "relationships"
       ? await getConceptNeighborhood(membership.workspaceId, view.concept.id)
       : null;
+  const louraApplications =
+    activeTab === "loura"
+      ? await listApplicationsForConcept(
+          membership.workspaceId,
+          view.concept.id,
+        )
+      : [];
+  const applicationOptions =
+    activeTab === "loura" && canEdit
+      ? await listApplications(membership.workspaceId)
+      : [];
 
   return (
     <>
@@ -278,12 +294,61 @@ export default async function ConceptPage({
           ) : null}
 
           {activeTab === "loura" ? (
-            <EmptyState title="No Loura applications are linked yet">
-              <p>
-                Project implications remain visibly separate from canonical
-                knowledge and begin in Milestone 8.
-              </p>
-            </EmptyState>
+            <section
+              className="reading-section"
+              aria-labelledby="loura-heading"
+            >
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">Project overlay</p>
+                  <h2 id="loura-heading">Loura applications</h2>
+                </div>
+                <span className="section-count">
+                  {louraApplications.length} links
+                </span>
+              </div>
+              {louraApplications.length ? (
+                <ul className="source-list">
+                  {louraApplications.map(({ application, link }) => (
+                    <li key={application.id}>
+                      <div className="source-card__meta">
+                        <Badge>
+                          {application.application_type.replaceAll("_", " ")}
+                        </Badge>
+                        <span>{application.status}</span>
+                      </div>
+                      <h3>
+                        <Link href={`/applications/${application.id}`}>
+                          {application.title}
+                        </Link>
+                      </h3>
+                      <p>{link.relevance_note}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <EmptyState title="No Loura applications are linked yet">
+                  <p>
+                    Project implications remain visibly separate from canonical
+                    knowledge.
+                  </p>
+                </EmptyState>
+              )}
+              {canEdit ? (
+                <details>
+                  <summary>Link an application</summary>
+                  <ConceptApplicationLinkForm
+                    workspaceId={membership.workspaceId}
+                    conceptId={view.concept.id}
+                    applications={applicationOptions.map((application) => ({
+                      id: application.id,
+                      title: application.title,
+                      status: application.status,
+                    }))}
+                  />
+                </details>
+              ) : null}
+            </section>
           ) : null}
 
           {activeTab === "history" ? (

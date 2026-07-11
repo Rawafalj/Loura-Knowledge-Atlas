@@ -498,6 +498,62 @@ export type Database = {
           },
         ];
       };
+      concept_applications: {
+        Row: {
+          application_id: string;
+          concept_id: string;
+          created_at: string;
+          created_by: string;
+          relevance_note: string;
+          workspace_id: string;
+        };
+        Insert: {
+          application_id: string;
+          concept_id: string;
+          created_at?: string;
+          created_by: string;
+          relevance_note: string;
+          workspace_id: string;
+        };
+        Update: {
+          application_id?: string;
+          concept_id?: string;
+          created_at?: string;
+          created_by?: string;
+          relevance_note?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "concept_applications_application_workspace_fk";
+            columns: ["application_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "loura_applications";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "concept_applications_concept_workspace_fk";
+            columns: ["concept_id", "workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "concepts";
+            referencedColumns: ["id", "workspace_id"];
+          },
+          {
+            foreignKeyName: "concept_applications_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "concept_applications_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       concept_relations: {
         Row: {
           confidence: number | null;
@@ -1264,6 +1320,79 @@ export type Database = {
           },
         ];
       };
+      loura_applications: {
+        Row: {
+          application_type: Database["public"]["Enums"]["loura_application_type"];
+          archived_at: string | null;
+          created_at: string;
+          created_by: string;
+          description_markdown: string;
+          external_url: string | null;
+          id: string;
+          implication_markdown: string | null;
+          owner_user_id: string | null;
+          project_tag: string | null;
+          status: Database["public"]["Enums"]["loura_application_status"];
+          title: string;
+          updated_at: string;
+          workspace_id: string;
+        };
+        Insert: {
+          application_type: Database["public"]["Enums"]["loura_application_type"];
+          archived_at?: string | null;
+          created_at?: string;
+          created_by: string;
+          description_markdown: string;
+          external_url?: string | null;
+          id?: string;
+          implication_markdown?: string | null;
+          owner_user_id?: string | null;
+          project_tag?: string | null;
+          status?: Database["public"]["Enums"]["loura_application_status"];
+          title: string;
+          updated_at?: string;
+          workspace_id: string;
+        };
+        Update: {
+          application_type?: Database["public"]["Enums"]["loura_application_type"];
+          archived_at?: string | null;
+          created_at?: string;
+          created_by?: string;
+          description_markdown?: string;
+          external_url?: string | null;
+          id?: string;
+          implication_markdown?: string | null;
+          owner_user_id?: string | null;
+          project_tag?: string | null;
+          status?: Database["public"]["Enums"]["loura_application_status"];
+          title?: string;
+          updated_at?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "loura_applications_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "loura_applications_owner_user_id_fkey";
+            columns: ["owner_user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "loura_applications_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       mastery_evidence: {
         Row: {
           ai_assessment: Json | null;
@@ -1826,6 +1955,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      archive_loura_application: {
+        Args: { p_application_id: string; p_workspace_id: string };
+        Returns: Json;
+      };
       bootstrap_workspace: {
         Args: { p_name: string; p_seed?: Json; p_slug: string };
         Returns: string;
@@ -1857,6 +1990,20 @@ export type Database = {
           p_metadata: Json;
           p_mime_type: string;
           p_size_bytes: number;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      create_loura_application: {
+        Args: {
+          p_application_type: Database["public"]["Enums"]["loura_application_type"];
+          p_description_markdown: string;
+          p_external_url?: string;
+          p_implication_markdown?: string;
+          p_owner_user_id?: string;
+          p_project_tag?: string;
+          p_status?: Database["public"]["Enums"]["loura_application_status"];
+          p_title: string;
           p_workspace_id: string;
         };
         Returns: Json;
@@ -1901,6 +2048,15 @@ export type Database = {
       is_workspace_member: {
         Args: { allowed_roles?: string[]; workspace_uuid: string };
         Returns: boolean;
+      };
+      link_concept_application: {
+        Args: {
+          p_application_id: string;
+          p_concept_id: string;
+          p_relevance_note: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
       };
       normalize_alias_text: { Args: { alias_value: string }; Returns: string };
       record_audit_event: {
@@ -2017,6 +2173,14 @@ export type Database = {
         Args: { profile_uuid: string };
         Returns: boolean;
       };
+      unlink_concept_application: {
+        Args: {
+          p_application_id: string;
+          p_concept_id: string;
+          p_workspace_id: string;
+        };
+        Returns: undefined;
+      };
       update_atlas_concept: {
         Args: {
           p_change_summary: string;
@@ -2036,6 +2200,21 @@ export type Database = {
           p_review_status: Database["public"]["Enums"]["content_status"];
           p_source_concept_id: string;
           p_target_concept_id: string;
+          p_workspace_id: string;
+        };
+        Returns: Json;
+      };
+      update_loura_application: {
+        Args: {
+          p_application_id: string;
+          p_application_type?: Database["public"]["Enums"]["loura_application_type"];
+          p_description_markdown?: string;
+          p_external_url?: string;
+          p_implication_markdown?: string;
+          p_owner_user_id?: string;
+          p_project_tag?: string;
+          p_status?: Database["public"]["Enums"]["loura_application_status"];
+          p_title?: string;
           p_workspace_id: string;
         };
         Returns: Json;
@@ -2092,6 +2271,16 @@ export type Database = {
       ingestion_job_status:
         "queued" | "running" | "completed" | "failed" | "dead_letter";
       ingestion_stage: "download" | "parse" | "persist" | "segment";
+      loura_application_status:
+        "proposed" | "active" | "decided" | "validated" | "archived";
+      loura_application_type:
+        | "decision"
+        | "component"
+        | "experiment"
+        | "deployment_question"
+        | "artifact"
+        | "risk"
+        | "requirement";
       mastery_evidence_type:
         | "self_assessment"
         | "explanation"
@@ -2344,6 +2533,22 @@ export const Constants = {
         "dead_letter",
       ],
       ingestion_stage: ["download", "parse", "persist", "segment"],
+      loura_application_status: [
+        "proposed",
+        "active",
+        "decided",
+        "validated",
+        "archived",
+      ],
+      loura_application_type: [
+        "decision",
+        "component",
+        "experiment",
+        "deployment_question",
+        "artifact",
+        "risk",
+        "requirement",
+      ],
       mastery_evidence_type: [
         "self_assessment",
         "explanation",

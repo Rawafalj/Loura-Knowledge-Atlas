@@ -216,6 +216,22 @@ export const askAnswerStatus = pgEnum("ask_answer_status", [
   "insufficient_evidence",
   "failed",
 ]);
+export const louraApplicationType = pgEnum("loura_application_type", [
+  "decision",
+  "component",
+  "experiment",
+  "deployment_question",
+  "artifact",
+  "risk",
+  "requirement",
+]);
+export const louraApplicationStatus = pgEnum("loura_application_status", [
+  "proposed",
+  "active",
+  "decided",
+  "validated",
+  "archived",
+]);
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1382,6 +1398,101 @@ export const askMessages = pgTable(
     check(
       "ask_messages_content_check",
       sql`length(trim(${table.contentMarkdown})) > 0`,
+    ),
+  ],
+);
+
+export const louraApplications = pgTable(
+  "loura_applications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    applicationType: louraApplicationType("application_type").notNull(),
+    title: text("title").notNull(),
+    descriptionMarkdown: text("description_markdown").notNull(),
+    implicationMarkdown: text("implication_markdown"),
+    status: louraApplicationStatus("status").notNull().default("proposed"),
+    ownerUserId: uuid("owner_user_id").references(() => profiles.id),
+    projectTag: text("project_tag"),
+    externalUrl: text("external_url"),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => profiles.id),
+    ...timestamps,
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("loura_applications_id_workspace_unique").on(
+      table.id,
+      table.workspaceId,
+    ),
+    index("loura_applications_workspace_status_idx").on(
+      table.workspaceId,
+      table.status,
+      table.updatedAt,
+    ),
+    check(
+      "loura_applications_title_check",
+      sql`length(trim(${table.title})) > 0`,
+    ),
+    check(
+      "loura_applications_description_check",
+      sql`length(trim(${table.descriptionMarkdown})) > 0`,
+    ),
+    check(
+      "loura_applications_external_url_check",
+      sql`${table.externalUrl} is null or ${table.externalUrl} ~ '^https?://[^[:space:]]+$'`,
+    ),
+    check(
+      "loura_applications_archived_check",
+      sql`(${table.status} = 'archived' and ${table.archivedAt} is not null) or (${table.status} <> 'archived' and ${table.archivedAt} is null)`,
+    ),
+  ],
+);
+
+export const conceptApplications = pgTable(
+  "concept_applications",
+  {
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    conceptId: uuid("concept_id").notNull(),
+    applicationId: uuid("application_id").notNull(),
+    relevanceNote: text("relevance_note").notNull(),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => profiles.id),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.workspaceId, table.conceptId, table.applicationId],
+    }),
+    foreignKey({
+      name: "concept_applications_concept_workspace_fk",
+      columns: [table.conceptId, table.workspaceId],
+      foreignColumns: [concepts.id, concepts.workspaceId],
+    }).onDelete("cascade"),
+    foreignKey({
+      name: "concept_applications_application_workspace_fk",
+      columns: [table.applicationId, table.workspaceId],
+      foreignColumns: [louraApplications.id, louraApplications.workspaceId],
+    }).onDelete("cascade"),
+    index("concept_applications_workspace_application_idx").on(
+      table.workspaceId,
+      table.applicationId,
+    ),
+    index("concept_applications_workspace_concept_idx").on(
+      table.workspaceId,
+      table.conceptId,
+    ),
+    check(
+      "concept_applications_relevance_check",
+      sql`length(trim(${table.relevanceNote})) >= 3`,
     ),
   ],
 );
