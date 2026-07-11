@@ -10,6 +10,7 @@ from psycopg.types.json import Jsonb
 
 from loura_ingest_worker.errors import DuplicateSourceError, IngestionError
 from loura_ingest_worker.models import QueueMessage, SourceRecord, SourceSegment
+from loura_ingest_worker.segmentation import stable_segment_id
 
 
 @dataclass(frozen=True)
@@ -156,6 +157,13 @@ class IngestionRepository:
             ]
         )
         with psycopg.connect(self.database_url, row_factory=dict_row) as connection:
+            # Version numbers are scoped to a source. Lock that source before
+            # computing MAX(version_number)+1 so different parser profiles or
+            # checksums cannot race into the same version number.
+            connection.execute(
+                "select pg_advisory_xact_lock(hashtextextended(%s, 0))",
+                (str(message.source_id),),
+            )
             connection.execute(
                 "select pg_advisory_xact_lock(hashtextextended(%s, 0))",
                 (idempotency_key,),
@@ -258,12 +266,13 @@ class IngestionRepository:
                 cursor.executemany(
                     """
                     insert into public.source_segments (
-                      workspace_id, source_version_id, ordinal, stable_key, segment_type,
+                      id, workspace_id, source_version_id, ordinal, stable_key, segment_type,
                       heading_path, text, token_count, page_start, page_end, provenance
-                    ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     [
                         (
+                            stable_segment_id(version_id, segment.stable_key),
                             workspace_id,
                             version_id,
                             segment.ordinal,

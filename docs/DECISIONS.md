@@ -285,7 +285,7 @@ Source ingestion crosses three trust boundaries: untrusted bytes, private storag
 
 ### Decision
 
-Originals and parser-derived artifacts live in separate private Supabase Storage buckets. Authenticated owner/editor sessions create upload intents and explicit URL jobs; the service-role key exists only in the worker. A durable versioned `pgmq` message invokes a pinned, lazily imported Docling parser. PDF enrichment features and remote parser services are disabled. Every completed version is identified by source checksum, parser profile, and deterministic extraction-schema version; completed versions and their structural segments are database-immutable.
+Originals and parser-derived artifacts live in separate private Supabase Storage buckets. Authenticated owner/editor sessions create upload intents and explicit URL jobs; the service-role key exists only in the worker. A durable versioned `pgmq` message invokes a pinned, lazily imported Docling parser. PDF enrichment features and remote parser services are disabled. Every completed version is identified by source checksum, parser profile, and deterministic extraction-schema version; completed versions and their structural segments are database-immutable. Segment citation UUIDs are derived deterministically from the source version and stable segment key, and version-number allocation is serialized per source.
 
 Explicit URLs are restricted to HTTP/HTTPS, standard ports, approved MIME types, bounded sizes, and public DNS/IP results. Every redirect is revalidated by both the web boundary and worker fetch boundary. The fetcher never crawls discovered links. Source text remains untrusted data and no external AI call or extraction proposal occurs in this milestone.
 

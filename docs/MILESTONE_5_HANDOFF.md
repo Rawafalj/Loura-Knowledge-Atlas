@@ -12,10 +12,11 @@
 - SSRF-resistant explicit URL ingestion with scheme/port/MIME/size limits, public address validation, per-redirect revalidation, DNS-rebinding-resistant IP pinning with original Host/SNI, and no link crawling.
 - Source-segment lexical search merged into the existing ranked search response without treating generated synthesis as evidence.
 - ADR-008 and updated dependency/environment documentation for the deterministic ingestion trust boundary.
+- Follow-up correctness hardening: citation segment UUIDs are deterministic for a source version and stable key, and source-version allocation is serialized per source to prevent concurrent numbering races.
 
 ## Acceptance evidence
 
-- `pnpm verify` — formatting, TypeScript/Python lint and strict types, all unit/component suites, 15 worker tests, and the production build passed.
+- `pnpm verify` — formatting, TypeScript/Python lint and strict types, all unit/component suites, 16 worker tests, and the production build passed after the follow-up hardening.
 - `pnpm test:db` — 114 pgTAP assertions passed plus seed/import and concurrent-cycle checks. Milestone 5 assertions cover RLS, workspace isolation, private buckets, queue/job idempotency, immutable completed evidence, source search, and retry.
 - `pnpm test:e2e` — production web health workflow passed in Chromium.
 - `pnpm test:e2e:service` — authenticated owner workflow passed against local Supabase and the live worker, including private upload, durable processing, immutable segments, source detail, and search discovery.

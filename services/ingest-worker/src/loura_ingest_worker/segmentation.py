@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import math
+from uuid import UUID, uuid5
 
 from loura_ingest_worker.models import SourceSegment, StructuralBlock
 
 MAX_SEGMENT_TOKENS = 1_000
+SEGMENT_ID_NAMESPACE = UUID("2c8c18f1-77c7-5e1d-a9f1-3f2b7f6a1d4c")
 
 
 def estimate_tokens(text: str) -> int:
@@ -54,3 +56,9 @@ def build_segments(blocks: tuple[StructuralBlock, ...]) -> tuple[SourceSegment, 
                 )
             )
     return tuple(segments)
+
+
+def stable_segment_id(source_version_id: UUID, stable_key: str) -> UUID:
+    """Return a deterministic citation ID for a segment within a version."""
+
+    return uuid5(SEGMENT_ID_NAMESPACE, f"{source_version_id}:{stable_key}")

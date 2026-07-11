@@ -1,5 +1,11 @@
+from uuid import UUID
+
 from loura_ingest_worker.models import StructuralBlock
-from loura_ingest_worker.segmentation import MAX_SEGMENT_TOKENS, build_segments
+from loura_ingest_worker.segmentation import (
+    MAX_SEGMENT_TOKENS,
+    build_segments,
+    stable_segment_id,
+)
 
 
 def test_segment_order_and_keys_are_stable() -> None:
@@ -37,3 +43,15 @@ def test_long_blocks_split_below_the_token_cap() -> None:
 
     assert len(segments) > 1
     assert all(segment.token_count <= MAX_SEGMENT_TOKENS for segment in segments)
+
+
+def test_segment_ids_are_stable_within_a_source_version() -> None:
+    version_id = UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    stable_key = "0123456789abcdef0123456789abcdef"
+
+    assert stable_segment_id(version_id, stable_key) == stable_segment_id(
+        version_id, stable_key
+    )
+    assert stable_segment_id(version_id, stable_key) != stable_segment_id(
+        UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), stable_key
+    )
