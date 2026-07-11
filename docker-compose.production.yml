@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - "3000:3000"
+    depends_on:
+      worker:
+        condition: service_started
+
+  worker:
+    build:
+      context: services/ingest-worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      WORKER_HOST: 0.0.0.0
+      WORKER_HEALTH_PORT: 8091
+      WORKER_PROCESS_JOBS: "true"
+    ports:
+      - "127.0.0.1:8091:8091"
