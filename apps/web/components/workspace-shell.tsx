@@ -8,10 +8,9 @@ import { signOut } from "@/app/atlas/actions";
 import { CommandPalette } from "./search/command-palette";
 
 const primaryNavigation = [
-  { href: "/atlas", label: "World map" },
-  { href: "/atlas#domains", label: "Domains" },
-  { href: "/atlas#concepts", label: "Concepts" },
-  { href: "/paths", label: "Learning paths" },
+  { href: "/atlas", label: "Explore", hint: "Knowledge landscape" },
+  { href: "/paths", label: "Learn", hint: "Guided paths" },
+  { href: "/ask", label: "Ask", hint: "Cited answers" },
 ];
 
 export function WorkspaceShell({
@@ -40,31 +39,22 @@ export function WorkspaceShell({
           </span>
         </Link>
         <nav aria-label="Atlas navigation">
-          <p className="nav-label">Atlas</p>
+          <p className="nav-label">Start here</p>
           {primaryNavigation.map((item) => (
-            <Link href={item.href} key={item.href} className="nav-link">
-              {item.label}
+            <Link href={item.href} key={item.href} className="nav-link nav-link--primary">
+              <span>{item.label}</span>
+              <small>{item.hint}</small>
             </Link>
           ))}
-          <p className="nav-label">Learning</p>
-          <Link href="/mastery" className="nav-link">
-            Mastery
-          </Link>
-          <p className="nav-label">Research</p>
-          <Link href="/sources" className="nav-link">
-            Sources
-          </Link>
-          <Link href="/review" className="nav-link">
-            Review queue
-          </Link>
-          <p className="nav-label">Apply</p>
-          <Link href="/applications" className="nav-link">
-            Loura applications
-          </Link>
-          <p className="nav-label">Later milestones</p>
-          <Link href="/ask" className="nav-link">
-            Ask Atlas
-          </Link>
+          <details className="nav-more">
+            <summary>More workspace tools</summary>
+            <div>
+              <Link href="/mastery" className="nav-link">Mastery</Link>
+              <Link href="/sources" className="nav-link">Sources</Link>
+              <Link href="/review" className="nav-link">Review queue</Link>
+              <Link href="/applications" className="nav-link">Loura applications</Link>
+            </div>
+          </details>
         </nav>
         <div className="sidebar-footer">
           <Badge tone="accent">{membership.role}</Badge>

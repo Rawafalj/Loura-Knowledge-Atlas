@@ -82,12 +82,12 @@ export default async function WorldMapPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Orient · World map"
+        eyebrow="Your private thinking space"
         title="The knowledge landscape"
         description={
           <p>
-            Stable geography for the external knowledge needed to reason about,
-            build, and govern Loura.
+            A calm place to build context, follow ideas, and make better
+            decisions—with every important claim tied back to its evidence.
           </p>
         }
         actions={
@@ -100,6 +100,39 @@ export default async function WorldMapPage() {
           )
         }
       />
+      <section className="atlas-quick-start" aria-labelledby="quick-start-heading">
+        <div className="atlas-quick-start__intro">
+          <p className="eyebrow">A simple way in</p>
+          <h2 id="quick-start-heading">What do you want to do?</h2>
+          <p>Start with one clear action. You can always go deeper later.</p>
+        </div>
+        <div className="atlas-action-grid">
+          <Link className="atlas-action-card atlas-action-card--explore" href="#domains">
+            <span className="atlas-action-card__icon" aria-hidden="true">◌</span>
+            <span className="atlas-action-card__body">
+              <strong>Explore the atlas</strong>
+              <span>See the big picture, then open a domain or concept.</span>
+            </span>
+            <span className="atlas-action-card__arrow" aria-hidden="true">↗</span>
+          </Link>
+          <Link className="atlas-action-card atlas-action-card--learn" href="/paths">
+            <span className="atlas-action-card__icon" aria-hidden="true">↗</span>
+            <span className="atlas-action-card__body">
+              <strong>Learn something next</strong>
+              <span>Follow a guided route with prerequisites and mastery.</span>
+            </span>
+            <span className="atlas-action-card__arrow" aria-hidden="true">↗</span>
+          </Link>
+          <Link className="atlas-action-card atlas-action-card--ask" href="/ask">
+            <span className="atlas-action-card__icon" aria-hidden="true">?</span>
+            <span className="atlas-action-card__body">
+              <strong>Ask with evidence</strong>
+              <span>Get a grounded answer from the sources in your workspace.</span>
+            </span>
+            <span className="atlas-action-card__arrow" aria-hidden="true">↗</span>
+          </Link>
+        </div>
+      </section>
       <div className="orientation-note">
         <strong>Tree for orientation; graph for truth.</strong>
         <span>Cards and hierarchy remain fully usable without graph code.</span>
