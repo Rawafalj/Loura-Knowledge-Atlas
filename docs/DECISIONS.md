@@ -302,19 +302,19 @@ Worker images and lockfiles are larger, but web and health startup stay lightwei
 
 ---
 
-## ADR-009 — Force-directed renderer for workspace semantic maps
+## ADR-009 — Force-directed renderer for workspace relationship maps
 
-**Status:** Accepted
+**Status:** Superseded in wording by ADR-011
 **Date:** 2026-07-12
 **Decision owners:** Rawaf / Loura, implementation lead
 
 ### Context
 
-React Flow with an ELK layered layout remains effective for a bounded local concept neighborhood, but it presents a workspace-wide semantic network as a process diagram. The product owner explicitly requested a more intuitive semantic map that communicates clusters, proximity, and exploratory navigation.
+React Flow with an ELK layered layout remains effective for a bounded local concept neighborhood, but it presents a workspace-wide relationship network as a process diagram. The product owner explicitly requested a more intuitive relationship explorer that communicates connected ideas and exploratory navigation.
 
 ### Decision
 
-Keep React Flow plus ELK for local, relationship-focused concept views. Add the MIT-licensed `react-force-graph-2d` renderer exclusively for the bounded workspace semantic-map route. The renderer consumes the same canonical concepts and typed relations from PostgreSQL; it does not add a graph database, alter graph truth, or persist layout coordinates. The relationship-table fallback remains available for keyboard and screen-reader access.
+Keep React Flow plus ELK for local, relationship-focused concept views. Add the MIT-licensed `react-force-graph-2d` renderer exclusively for the bounded workspace relationship-map route. The renderer consumes the same canonical concepts and typed relations from PostgreSQL; it does not add a graph database, alter graph truth, or persist layout coordinates. The relationship-table fallback remains available for keyboard and screen-reader access.
 
 ### Alternatives considered
 
@@ -324,7 +324,7 @@ Keep React Flow plus ELK for local, relationship-focused concept views. Add the 
 
 ### Consequences
 
-The semantic-map bundle adds a client-only canvas dependency and remains bounded by the configured node cap. Node click and hover interactions must always preserve a readable list fallback, and the existing local graph remains deterministic for detail pages.
+The relationship-map bundle adds a client-only canvas dependency and remains bounded by the configured node cap. Node click and hover interactions must always preserve a readable list fallback, and the existing local graph remains deterministic for detail pages.
 
 ### Validation or reversal trigger
 
@@ -334,7 +334,7 @@ Revisit the renderer if measured interaction performance is poor at the configur
 
 ## ADR-010 — Task-led first-use and workspace navigation
 
-**Status:** Accepted
+**Status:** Superseded by ADR-011
 **Date:** 2026-07-12
 **Decision owners:** Rawaf / Loura, implementation lead
 
@@ -355,3 +355,25 @@ Make Home the authenticated entry point and organize primary navigation around u
 ### Consequences
 
 Curator capability remains available but is progressively disclosed. Empty and error states must explain the current readiness condition and guide the user to a useful next action. The graph remains a supporting exploration surface rather than the default first-use experience.
+
+---
+
+## ADR-011 — Atlas-first orientation and guided judgment
+
+**Status:** Accepted (supersedes ADR-009 wording and ADR-010 navigation)
+**Date:** 2026-07-12
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+Founder review clarified the product's actual job: help the team answer, “How can we build Loura well?” by making a large external knowledge terrain comprehensible without replacing human judgment. A task-led home and course-like framing made the product feel like a dashboard instead of an atlas. Calling a graph derived from canonical typed relations a “semantic map” also implied an embedding-similarity projection that does not exist.
+
+### Decision
+
+Make `/atlas` the authenticated entry point and the primary navigation anchor. The world map remains a stable, neutral external domain geography; Loura-specific decisions, applications, and implications are a visibly separate overlay. Use cards, hierarchy, concise synthesis, evidence state, and local relationship views as the default orientation system. Rename the workspace-wide force view to **Relationship map**. It is bounded, optional exploration of canonical hierarchy and typed relations, with an accessible list fallback; it is not presented as semantic clustering.
+
+Ask Atlas provides guided judgment in global, domain, concept, and completed-source context. It returns source-grounded evidence, distinguishes insufficiency, and does not make or apply decisions. Learning and mastery remain available as secondary personal tools, not the product's first-use model.
+
+### Consequences
+
+The experience reuses the existing canonical graph, immutable source segments, Ask scopes, and Loura application bridge without a new database model. Source-scoped Ask is added to keep a source-detail inquiry bounded to that source's latest completed immutable version. The previous task-led start choice and recommended-action home are removed. Future true semantic projections require an explicit design and evidence/embedding policy before being named or exposed as such.

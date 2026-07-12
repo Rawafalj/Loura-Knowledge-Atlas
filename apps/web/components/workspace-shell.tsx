@@ -8,10 +8,10 @@ import { signOut } from "@/app/atlas/actions";
 import { CommandPalette } from "./search/command-palette";
 
 const primaryNavigation = [
-  { href: "/home", label: "Home", hint: "Next useful action" },
-  { href: "/atlas", label: "Understand", hint: "Knowledge landscape" },
-  { href: "/paths", label: "Learn", hint: "Guided paths" },
+  { href: "/atlas", label: "Atlas", hint: "Knowledge landscape" },
+  { href: "/sources", label: "Evidence", hint: "Private sources" },
   { href: "/ask", label: "Ask", hint: "Cited answers" },
+  { href: "/applications", label: "Decisions", hint: "Loura implications" },
 ];
 
 export function WorkspaceShell({
@@ -27,7 +27,7 @@ export function WorkspaceShell({
     <div className="app-shell">
       <aside className="app-sidebar">
         <Link
-          href="/home"
+          href="/atlas"
           className="brand-mark"
           aria-label="Loura Knowledge Atlas home"
         >
@@ -40,7 +40,7 @@ export function WorkspaceShell({
           </span>
         </Link>
         <nav aria-label="Atlas navigation">
-          <p className="nav-label">Your workspace</p>
+          <p className="nav-label">Atlas</p>
           {primaryNavigation.map((item) => (
             <Link
               href={item.href}
@@ -52,19 +52,16 @@ export function WorkspaceShell({
             </Link>
           ))}
           <details className="nav-more">
-            <summary>Library and management</summary>
+            <summary>Explore and manage</summary>
             <div>
-              <Link href="/sources" className="nav-link">
-                Evidence library
+              <Link href="/map" className="nav-link">
+                Relationship map
+              </Link>
+              <Link href="/paths" className="nav-link">
+                Learning routes
               </Link>
               <Link href="/mastery" className="nav-link">
-                My learning progress
-              </Link>
-              <Link href="/map" className="nav-link">
-                Semantic map
-              </Link>
-              <Link href="/applications" className="nav-link">
-                Loura decisions
+                Mastery notes
               </Link>
               <Link href="/review" className="nav-link">
                 Review changes

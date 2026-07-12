@@ -6,5 +6,5 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   await requireWorkspaceMembership();
-  redirect("/home");
+  redirect("/atlas");
 }

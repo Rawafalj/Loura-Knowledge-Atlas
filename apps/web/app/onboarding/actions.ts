@@ -10,7 +10,6 @@ export type OnboardingState = { status: "idle" | "error"; message: string };
 
 const onboardingSchema = z.object({
   name: z.string().trim().min(2).max(80),
-  startingPoint: z.enum(["understand", "learn", "evidence", "apply"]),
   installSeed: z.boolean(),
 });
 
@@ -35,13 +34,12 @@ export async function createWorkspace(
   await requireAuthenticatedUser();
   const parsed = onboardingSchema.safeParse({
     name: formData.get("name"),
-    startingPoint: formData.get("startingPoint"),
     installSeed: formData.get("installSeed") === "on",
   });
   if (!parsed.success) {
     return {
       status: "error",
-      message: "Name the workspace and choose a starting point.",
+      message: "Name the workspace to create your atlas.",
     };
   }
   try {
@@ -56,5 +54,5 @@ export async function createWorkspace(
       message: "Workspace setup failed. Try again in a moment.",
     };
   }
-  redirect(`/home?start=${parsed.data.startingPoint}`);
+  redirect("/atlas");
 }

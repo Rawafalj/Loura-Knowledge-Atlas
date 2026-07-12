@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { MockAnswerModelClient } from "@/lib/ai/mock-clients";
-import { askAnswerSchema } from "@/lib/ask/contracts";
+import { askAnswerSchema, askRequestSchema } from "@/lib/ask/contracts";
 import {
   AnswerValidationError,
   buildAnswerPrompt,
@@ -103,5 +103,24 @@ describe("Ask Atlas grounding contracts", () => {
     expect(result.provider).toBe("mock");
     expect(result.model).toBe("deterministic-answer-fixture");
     expect(result.data).toEqual(answer);
+  });
+
+  it("accepts a source-scoped question without broadening its source scope", () => {
+    const request = askRequestSchema.parse({
+      workspaceId: "00000000-0000-4000-8000-000000000001",
+      question: "What does this source establish?",
+      scope: {
+        domainIds: [],
+        conceptIds: [],
+        sourceIds: ["00000000-0000-4000-8000-000000000002"],
+        pathId: null,
+        reviewedOnly: true,
+        includeDraftProposals: false,
+      },
+    });
+    expect(request.scope.sourceIds).toEqual([
+      "00000000-0000-4000-8000-000000000002",
+    ]);
+    expect(request.scope.conceptIds).toEqual([]);
   });
 });

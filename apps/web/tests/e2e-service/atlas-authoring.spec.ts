@@ -97,23 +97,23 @@ test.describe("Milestones 2–5 atlas workflow", () => {
 
     await page.goto("/onboarding");
     await expect(page).toHaveURL(/\/onboarding$/);
-    await page.getByLabel("Workspace name").fill("Milestone 2 Atlas");
-    await page.getByLabel("Workspace slug").fill(`m2-${unique}`);
     await page
-      .getByRole("button", { name: "Create private workspace" })
-      .click();
+      .getByLabel("What should we call this workspace?")
+      .fill("Milestone 2 Atlas");
+    await page.getByRole("button", { name: "Create workspace" }).click();
     await expect(page).toHaveURL(/\/atlas$/);
     await expect(
-      page.getByRole("heading", { name: "The knowledge landscape" }),
+      page.getByRole("heading", { name: "How can we build Loura well?" }),
     ).toBeVisible();
 
-    const { data: workspace, error: workspaceError } = await admin
-      .from("workspaces")
-      .select("id")
-      .eq("slug", `m2-${unique}`)
-      .single();
-    if (workspaceError) throw workspaceError;
-    workspaceId = workspace.id;
+    const [membership] = await database<{ workspace_id: string }[]>`
+      select workspace_id from public.workspace_members
+      where user_id = ${ownerId}
+      order by created_at desc
+      limit 1
+    `;
+    if (!membership) throw new Error("Workspace membership is missing");
+    workspaceId = membership.workspace_id;
 
     await page
       .getByRole("link", { name: "Research, Reasoning, and Measurement" })
@@ -341,6 +341,17 @@ test.describe("Milestones 2–5 atlas workflow", () => {
     await expect(sourceResult).toContainText("immutable source segment");
     await sourceResult.click();
     await expect(page).toHaveURL(/\/sources\/[0-9a-f-]+#segment-/);
+    const sourceQuestion = page.getByLabel(
+      "Question about Service-backed ingestion fixture",
+    );
+    await sourceQuestion.fill("What does this source establish about retries?");
+    await page.getByRole("button", { name: "Ask Atlas" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Citations" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Service-backed ingestion fixture"),
+    ).toBeVisible();
 
     await page.goto("/concepts/test-observation");
     await page.getByRole("link", { name: "Edit concept" }).click();

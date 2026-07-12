@@ -4,6 +4,7 @@ import { Badge, EmptyState, PageHeader } from "@loura/ui";
 
 import { ConceptGraph } from "@/components/graph/concept-graph";
 import { ConceptApplicationLinkForm } from "@/components/applications/concept-application-link-form";
+import { AskComposer } from "@/components/ask/ask-composer";
 import { MasteryForm } from "@/components/learning/mastery-form";
 import { Markdown } from "@/components/markdown";
 import { RelationshipTable } from "@/components/relationship-table";
@@ -86,7 +87,7 @@ export default async function ConceptPage({
   return (
     <>
       <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <Link href="/atlas">World map</Link>
+        <Link href="/atlas">Atlas</Link>
         <span aria-hidden="true">/</span>
         <Link href={`/atlas/domains/${view.domain.slug}`}>
           {view.domain.title}
@@ -113,6 +114,12 @@ export default async function ConceptPage({
         actions={
           canEdit ? (
             <div className="action-row">
+              <Link
+                className="ui-button ui-button--secondary"
+                href="#ask-about-concept"
+              >
+                Ask about this
+              </Link>
               <Link
                 className="ui-button ui-button--secondary"
                 href={`/concepts/${view.concept.slug}/relations/new`}
@@ -231,10 +238,11 @@ export default async function ConceptPage({
                 markdown={view.concept.common_confusions_markdown}
               />
               <section className="reading-section muted-section">
-                <h2>Claims and evidence</h2>
+                <h2>Evidence status</h2>
                 <p>
-                  Claims and exact source evidence arrive with deterministic
-                  source ingestion in Milestone 5.
+                  Ask a focused question below to inspect exact, stored source
+                  passages. If the atlas lacks evidence, it will say so rather
+                  than fill the gap with an unsupported answer.
                 </p>
               </section>
             </>
@@ -285,12 +293,22 @@ export default async function ConceptPage({
           ) : null}
 
           {activeTab === "sources" ? (
-            <EmptyState title="No source passages are available yet">
+            <section className="reading-section" id="ask-about-concept">
+              <p className="eyebrow">Evidence inquiry</p>
+              <h2>Inspect source-grounded evidence</h2>
               <p>
-                Milestone 5 will add immutable sources and exact segment
-                citations. This placeholder does not fabricate evidence.
+                Ask a question in this concept’s context. Every displayed
+                citation opens the exact immutable source segment that supports
+                the answer.
               </p>
-            </EmptyState>
+              <AskComposer
+                workspaceId={membership.workspaceId}
+                context={{
+                  label: view.concept.canonical_name,
+                  conceptIds: [view.concept.id],
+                }}
+              />
+            </section>
           ) : null}
 
           {activeTab === "loura" ? (
@@ -301,7 +319,7 @@ export default async function ConceptPage({
               <div className="section-heading">
                 <div>
                   <p className="eyebrow">Project overlay</p>
-                  <h2 id="loura-heading">Loura applications</h2>
+                  <h2 id="loura-heading">Loura implications</h2>
                 </div>
                 <span className="section-count">
                   {louraApplications.length} links
@@ -327,10 +345,11 @@ export default async function ConceptPage({
                   ))}
                 </ul>
               ) : (
-                <EmptyState title="No Loura applications are linked yet">
+                <EmptyState title="No Loura implications are linked yet">
                   <p>
-                    Project implications remain visibly separate from canonical
-                    knowledge.
+                    Link a decision, component, experiment, or risk when this
+                    concept has a specific implication for Loura. The atlas
+                    remains valid without an application link.
                   </p>
                 </EmptyState>
               )}
@@ -484,6 +503,23 @@ export default async function ConceptPage({
           </div>
         </aside>
       </div>
+      {activeTab === "overview" ? (
+        <section className="concept-question" id="ask-about-concept">
+          <p className="eyebrow">Guided judgment</p>
+          <h2>What does this mean for Loura?</h2>
+          <p>
+            Ask about this concept’s assumptions, trade-offs, or constraints.
+            Loura will separate retrieved evidence from any inference.
+          </p>
+          <AskComposer
+            workspaceId={membership.workspaceId}
+            context={{
+              label: view.concept.canonical_name,
+              conceptIds: [view.concept.id],
+            }}
+          />
+        </section>
+      ) : null}
     </>
   );
 }

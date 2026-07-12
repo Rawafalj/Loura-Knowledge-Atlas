@@ -10,8 +10,8 @@ export default async function ApplicationsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Apply · Loura overlay"
-        title="Loura applications"
+        eyebrow="Decisions · Loura implications"
+        title="Loura implications"
         description={
           <p>
             Decisions, components, experiments, and deployment concerns linked
@@ -52,14 +52,14 @@ export default async function ApplicationsPage() {
                 className="card-link"
                 href={`/applications/${application.id}`}
               >
-                Open application <span aria-hidden="true">→</span>
+                Open implication <span aria-hidden="true">→</span>
               </Link>
             </Card>
           ))}
         </div>
       ) : (
         <EmptyState
-          title="No Loura applications yet"
+          title="No Loura implications yet"
           action={
             membership.role !== "viewer" ? (
               <Link
@@ -73,7 +73,7 @@ export default async function ApplicationsPage() {
         >
           <p>
             Link an independent knowledge concept to a concrete Loura decision,
-            artifact, or deployment question.
+            artifact, experiment, risk, or deployment question.
           </p>
         </EmptyState>
       )}

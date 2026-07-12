@@ -25,8 +25,10 @@ export async function getConceptNeighborhood(
   return conceptNeighborhoodSchema.parse(data);
 }
 
-/** Load a bounded, workspace-wide semantic map for the primary Explore view. */
-export async function getSemanticMap(workspaceId: string): Promise<ConceptNeighborhood> {
+/** Load a bounded, workspace-wide relationship map for optional exploration. */
+export async function getSemanticMap(
+  workspaceId: string,
+): Promise<ConceptNeighborhood> {
   const supabase = await createSupabaseServerClient();
   const world = await getWorldMap(workspaceId);
   const cap = configuredGraphNodeCap();
@@ -53,7 +55,7 @@ export async function getSemanticMap(workspaceId: string): Promise<ConceptNeighb
     supabase.from("relation_types").select("*").eq("workspace_id", workspaceId),
   ]);
   if (relationsResult.error || typesResult.error) {
-    throw new Error("Unable to load semantic map relations");
+    throw new Error("Unable to load relationship map relations");
   }
   const typeById = new Map(typesResult.data.map((type) => [type.id, type]));
   const relationEdges = relationsResult.data.flatMap((relation) => {

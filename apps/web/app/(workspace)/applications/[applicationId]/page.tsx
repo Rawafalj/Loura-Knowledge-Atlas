@@ -32,17 +32,17 @@ export default async function ApplicationDetailPage({
   return (
     <>
       <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <Link href="/applications">Loura applications</Link>
+        <Link href="/applications">Loura implications</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{detail.application.title}</span>
       </nav>
       <PageHeader
-        eyebrow={`Apply · ${detail.application.application_type.replaceAll("_", " ")}`}
+        eyebrow={`Decision context · ${detail.application.application_type.replaceAll("_", " ")}`}
         title={detail.application.title}
         description={
           <p>
-            Project context and implications are kept separate from canonical
-            knowledge.
+            This is Loura-specific decision context. It is linked to, but never
+            treated as, canonical knowledge.
           </p>
         }
         actions={
@@ -73,7 +73,7 @@ export default async function ApplicationDetailPage({
       </div>
       <div className="source-detail-grid">
         <Card>
-          <p className="eyebrow">Application context</p>
+          <p className="eyebrow">Loura context</p>
           <Markdown>{detail.application.description_markdown}</Markdown>
         </Card>
         <Card>

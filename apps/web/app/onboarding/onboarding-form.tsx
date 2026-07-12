@@ -24,53 +24,13 @@ export function OnboardingForm() {
           required
         />
       </label>
-      <fieldset className="starting-point-picker">
-        <legend>What would you like to do first?</legend>
-        <p>Choose a starting point. You can switch modes at any time.</p>
-        <label>
-          <input
-            defaultChecked
-            name="startingPoint"
-            type="radio"
-            value="understand"
-          />
-          <span>
-            <strong>Understand a topic</strong>
-            <small>Explore the knowledge landscape and connected ideas.</small>
-          </span>
-        </label>
-        <label>
-          <input name="startingPoint" type="radio" value="learn" />
-          <span>
-            <strong>Follow a learning route</strong>
-            <small>
-              See what matters next and work through it deliberately.
-            </small>
-          </span>
-        </label>
-        <label>
-          <input name="startingPoint" type="radio" value="evidence" />
-          <span>
-            <strong>Add evidence</strong>
-            <small>Bring in a private source for later cited answers.</small>
-          </span>
-        </label>
-        <label>
-          <input name="startingPoint" type="radio" value="apply" />
-          <span>
-            <strong>Connect knowledge to a decision</strong>
-            <small>
-              Start from the context behind a Loura decision or question.
-            </small>
-          </span>
-        </label>
-      </fieldset>
       <label className="checkbox-row">
         <input name="installSeed" type="checkbox" defaultChecked />
         <span>
           <strong>Install the starter atlas</strong>
           <small>
-            Recommended: ten knowledge areas and one curated learning route.
+            Recommended: a stable ten-area knowledge geography you can deepen
+            with evidence over time.
           </small>
         </span>
       </label>

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import { Markdown } from "@/components/markdown";
+import type { AskScope } from "@/lib/ask/contracts";
 
 type Citation = {
   citationId: string;
@@ -15,7 +16,28 @@ type Citation = {
   };
 };
 
-export function AskComposer({ workspaceId }: { workspaceId: string }) {
+type AskContext = Partial<
+  Pick<AskScope, "domainIds" | "conceptIds" | "sourceIds">
+> & {
+  label: string;
+};
+
+const atlasScope: AskScope = {
+  domainIds: [],
+  conceptIds: [],
+  sourceIds: [],
+  pathId: null,
+  reviewedOnly: true,
+  includeDraftProposals: false,
+};
+
+export function AskComposer({
+  workspaceId,
+  context,
+}: {
+  workspaceId: string;
+  context?: AskContext;
+}) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [citations, setCitations] = useState<Citation[]>([]);
@@ -48,7 +70,12 @@ export function AskComposer({ workspaceId }: { workspaceId: string }) {
           workspaceId,
           threadId,
           question,
-          scope: { reviewedOnly: true, includeDraftProposals: false },
+          scope: {
+            ...atlasScope,
+            domainIds: context?.domainIds ?? [],
+            conceptIds: context?.conceptIds ?? [],
+            sourceIds: context?.sourceIds ?? [],
+          },
         }),
       });
       if (!response.ok || !response.body)
@@ -114,15 +141,22 @@ export function AskComposer({ workspaceId }: { workspaceId: string }) {
           void ask();
         }}
       >
-        <label htmlFor="ask-question">Question</label>
+        <label htmlFor="ask-question">
+          {context ? `Question about ${context.label}` : "Question"}
+        </label>
         <textarea
           id="ask-question"
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
-          placeholder="Ask why a retry can create a dangerous duplicate action…"
+          placeholder={
+            context
+              ? `Ask what matters about ${context.label}…`
+              : "Ask why a retry can create a dangerous duplicate action…"
+          }
           rows={5}
         />
         <p className="form-help">
+          {context ? `This answer is scoped to ${context.label}. ` : ""}
           Reviewed concepts and completed source segments only. Source text is
           treated as untrusted evidence.
         </p>

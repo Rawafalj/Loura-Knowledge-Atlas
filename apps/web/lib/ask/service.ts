@@ -140,15 +140,46 @@ export async function retrieveAskEvidence(
     .map((source) => segmentIdFromRoute(source.route))
     .filter((id): id is string => Boolean(id))
     .slice(0, 20);
-  const segmentRows = segmentIds.length
+  const scopedVersions = input.scope.sourceIds.length
     ? await supabase
-        .from("source_segments")
-        .select(
-          "id, source_version_id, ordinal, text, page_start, page_end, heading_path, workspace_id",
-        )
+        .from("source_versions")
+        .select("id, source_id, version_number")
         .eq("workspace_id", workspaceId)
-        .in("id", segmentIds)
+        .eq("processing_status", "completed")
+        .in("source_id", input.scope.sourceIds)
+        .order("version_number", { ascending: false })
     : { data: [], error: null };
+  if (scopedVersions.error)
+    throw new AskServiceError(
+      "INTERNAL_ERROR",
+      "Unable to load the scoped source version.",
+    );
+  const latestVersionIds = [
+    ...new Map(
+      scopedVersions.data.map((version) => [version.source_id, version.id]),
+    ).values(),
+  ].slice(0, 20);
+  const segmentRows = input.scope.sourceIds.length
+    ? latestVersionIds.length
+      ? await supabase
+          .from("source_segments")
+          .select(
+            "id, source_version_id, ordinal, text, page_start, page_end, heading_path, workspace_id",
+          )
+          .eq("workspace_id", workspaceId)
+          .in("source_version_id", latestVersionIds)
+          .order("ordinal")
+          .limit(20)
+      : { data: [], error: null }
+    : segmentIds.length
+      ? await supabase
+          .from("source_segments")
+          .select(
+            "id, source_version_id, ordinal, text, page_start, page_end, heading_path, workspace_id",
+          )
+          .eq("workspace_id", workspaceId)
+          .in("id", segmentIds)
+      : { data: [], error: null };
   if (segmentRows.error)
     throw new AskServiceError(
       "INTERNAL_ERROR",

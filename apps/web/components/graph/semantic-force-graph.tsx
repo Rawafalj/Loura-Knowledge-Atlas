@@ -90,7 +90,9 @@ export function SemanticForceGraph({
   }, []);
 
   const graphData = useMemo(() => {
-    const links = dataset.edges.filter((edge) => enabledKeys.has(edge.relationKey));
+    const links = dataset.edges.filter((edge) =>
+      enabledKeys.has(edge.relationKey),
+    );
     const degreeById = new Map<string, number>();
     for (const link of links) {
       degreeById.set(link.source, (degreeById.get(link.source) ?? 0) + 1);
@@ -109,7 +111,7 @@ export function SemanticForceGraph({
     <div className="semantic-force-graph">
       <div className="semantic-force-toolbar">
         <div>
-          <p className="eyebrow">Live semantic view</p>
+          <p className="eyebrow">Interactive relationship view</p>
           <strong>Drag, zoom, and select an idea</strong>
         </div>
         <fieldset>
@@ -138,7 +140,7 @@ export function SemanticForceGraph({
       <div
         ref={hostRef}
         className="semantic-force-canvas"
-        aria-label="Interactive workspace semantic map"
+        aria-label="Interactive workspace relationship map"
       >
         {width ? (
           <ForceGraph2D
@@ -193,7 +195,9 @@ export function SemanticForceGraph({
             </span>
           </>
         ) : (
-          <span>Hover over an idea to inspect it. Click to open its concept.</span>
+          <span>
+            Hover over an idea to inspect it. Click to open its concept.
+          </span>
         )}
       </div>
     </div>

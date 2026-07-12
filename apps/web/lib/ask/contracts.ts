@@ -25,6 +25,7 @@ export type AtlasAnswer = AskAnswer;
 export const askScopeSchema = z.object({
   domainIds: z.array(z.string().uuid()).max(20).default([]),
   conceptIds: z.array(z.string().uuid()).max(50).default([]),
+  sourceIds: z.array(z.string().uuid()).max(20).default([]),
   pathId: z.string().uuid().nullable().default(null),
   reviewedOnly: z.boolean().default(true),
   includeDraftProposals: z.boolean().default(false),
@@ -39,6 +40,7 @@ export const askRequestSchema = z.object({
   scope: askScopeSchema.default({
     domainIds: [],
     conceptIds: [],
+    sourceIds: [],
     pathId: null,
     reviewedOnly: true,
     includeDraftProposals: false,

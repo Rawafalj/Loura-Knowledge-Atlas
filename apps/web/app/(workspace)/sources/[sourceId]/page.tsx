@@ -4,6 +4,7 @@ import { Badge, Card, PageHeader } from "@loura/ui";
 
 import { JobProgress } from "@/components/sources/job-progress";
 import { GenerateProposalButton } from "@/components/proposals/generate-proposal-button";
+import { AskComposer } from "@/components/ask/ask-composer";
 import { requireWorkspaceMembership } from "@/lib/auth/session";
 import { getSourceDetail } from "@/lib/sources/service";
 
@@ -147,6 +148,26 @@ export default async function SourceDetailPage({
           </Card>
         )}
       </section>
+      {detail.source.ingestion_status === "completed" ? (
+        <section
+          className="source-question"
+          aria-labelledby="source-question-heading"
+        >
+          <p className="eyebrow">Grounded inquiry</p>
+          <h2 id="source-question-heading">Ask about this source</h2>
+          <p>
+            Keep the answer within this source’s completed immutable segments.
+            Loura will cite the exact passages it uses.
+          </p>
+          <AskComposer
+            workspaceId={membership.workspaceId}
+            context={{
+              label: detail.source.title,
+              sourceIds: [detail.source.id],
+            }}
+          />
+        </section>
+      ) : null}
     </>
   );
 }

@@ -16,7 +16,7 @@ Avoid adding a project because it is fashionable or adjacent to knowledge graphs
 | shadcn/ui | UI primitives/source | Adopt selectively | Open code copied into repository; accessible building blocks and good Codex legibility |
 | React Flow | Local graph UI | Adopt | MIT-licensed node/edge interaction without forcing a graph backend |
 | ELK.js / Eclipse Layout Kernel | Graph layout | Adopt | Mature hierarchical/layered layout algorithms |
-| react-force-graph-2d | Workspace semantic map | Adopt selectively | MIT-licensed, client-only force-directed canvas renderer for bounded semantic exploration; paired with a relationship-list fallback |
+| react-force-graph-2d | Workspace relationship map | Adopt selectively | MIT-licensed, client-only force-directed canvas renderer for bounded typed-relation exploration; paired with a relationship-list fallback |
 | MDXEditor | Markdown editing | Adopt | Open-source editor that accepts/emits Markdown, preserving portable content |
 | Supabase | Postgres/Auth/Storage/Queues | Adopt | Consolidates required platform capabilities and remains self-hostable |
 | PostgreSQL | Canonical data | Adopt | Transactions, relational integrity, RLS, recursive queries, FTS |

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Badge, EmptyState, PageHeader } from "@loura/ui";
 
 import { Markdown } from "@/components/markdown";
+import { AskComposer } from "@/components/ask/ask-composer";
 import {
   getDomainView,
   type ConceptTreeNode,
@@ -66,12 +67,12 @@ export default async function DomainPage({
   return (
     <>
       <nav className="breadcrumbs" aria-label="Breadcrumb">
-        <Link href="/atlas">World map</Link>
+        <Link href="/atlas">Atlas</Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{view.domain.title}</span>
       </nav>
       <PageHeader
-        eyebrow={`${view.domain.kind} knowledge area`}
+        eyebrow={`${view.domain.kind} territory`}
         title={view.domain.title}
         description={<p>{view.domain.short_description}</p>}
         actions={
@@ -160,21 +161,22 @@ export default async function DomainPage({
             )}
           </section>
           <section
-            className="placeholder-grid"
-            aria-label="Domain companion views"
+            className="domain-companion"
+            aria-labelledby="domain-question-heading"
           >
-            <div>
-              <strong>Map</strong>
-              <span>Open a concept to explore its local relationship map.</span>
-            </div>
-            <div>
-              <strong>Paths</strong>
-              <span>Learning routes begin in Milestone 4.</span>
-            </div>
-            <div>
-              <strong>Sources and gaps</strong>
-              <span>Deterministic ingestion begins in Milestone 5.</span>
-            </div>
+            <p className="eyebrow">Guided judgment</p>
+            <h2 id="domain-question-heading">Ask about this territory</h2>
+            <p>
+              Ask Atlas uses this domain as context and returns only answers it
+              can support with reviewed concepts and completed source passages.
+            </p>
+            <AskComposer
+              workspaceId={membership.workspaceId}
+              context={{
+                label: view.domain.title,
+                domainIds: [view.domain.id],
+              }}
+            />
           </section>
         </div>
       </div>

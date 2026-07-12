@@ -82,12 +82,13 @@ export default async function WorldMapPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Your private thinking space"
-        title="The knowledge landscape"
+        eyebrow="Loura Knowledge Atlas"
+        title="How can we build Loura well?"
         description={
           <p>
-            A calm place to build context, follow ideas, and make better
-            decisions—with every important claim tied back to its evidence.
+            Explore the external knowledge terrain required to understand,
+            design, build, govern, and improve Loura. Start broad, then follow
+            concepts, relationships, and evidence at the depth you need.
           </p>
         }
         actions={
@@ -100,43 +101,38 @@ export default async function WorldMapPage() {
           )
         }
       />
-      <section className="atlas-quick-start" aria-labelledby="quick-start-heading">
-        <div className="atlas-quick-start__intro">
-          <p className="eyebrow">A simple way in</p>
-          <h2 id="quick-start-heading">What do you want to do?</h2>
-          <p>Start with one clear action. You can always go deeper later.</p>
+      <section
+        className="atlas-orientation"
+        aria-labelledby="atlas-reading-heading"
+      >
+        <div>
+          <p className="eyebrow">Read the atlas</p>
+          <h2 id="atlas-reading-heading">A map, not a maze</h2>
+          <p>
+            Domains provide stable geography. Concepts are the landmarks.
+            Evidence supports what the atlas says, while Loura implications
+            remain visibly separate from canonical knowledge.
+          </p>
         </div>
-        <div className="atlas-action-grid">
-          <Link className="atlas-action-card atlas-action-card--explore" href="/map">
-            <span className="atlas-action-card__icon" aria-hidden="true">◌</span>
-            <span className="atlas-action-card__body">
-              <strong>Explore the atlas</strong>
-              <span>See the big picture, then open a domain or concept.</span>
-            </span>
-            <span className="atlas-action-card__arrow" aria-hidden="true">↗</span>
-          </Link>
-          <Link className="atlas-action-card atlas-action-card--learn" href="/paths">
-            <span className="atlas-action-card__icon" aria-hidden="true">↗</span>
-            <span className="atlas-action-card__body">
-              <strong>Learn something next</strong>
-              <span>Follow a guided route with prerequisites and mastery.</span>
-            </span>
-            <span className="atlas-action-card__arrow" aria-hidden="true">↗</span>
-          </Link>
-          <Link className="atlas-action-card atlas-action-card--ask" href="/ask">
-            <span className="atlas-action-card__icon" aria-hidden="true">?</span>
-            <span className="atlas-action-card__body">
-              <strong>Ask with evidence</strong>
-              <span>Get a grounded answer from the sources in your workspace.</span>
-            </span>
-            <span className="atlas-action-card__arrow" aria-hidden="true">↗</span>
-          </Link>
-        </div>
+        <ol className="atlas-orientation__legend">
+          <li>
+            <strong>1</strong>
+            <span>Orient in a domain</span>
+          </li>
+          <li>
+            <strong>2</strong>
+            <span>Inspect a concept and its relationships</span>
+          </li>
+          <li>
+            <strong>3</strong>
+            <span>Verify with stored source passages</span>
+          </li>
+        </ol>
       </section>
-      <div className="orientation-note">
-        <strong>Tree for orientation; graph for truth.</strong>
-        <span>Cards and hierarchy remain fully usable without graph code.</span>
-      </div>
+      <p className="orientation-note">
+        <strong>Tree for orientation; graph for relationships.</strong> Cards
+        and hierarchy remain fully usable without graph code.
+      </p>
       <DomainGroup
         id="supporting-roots"
         title="Supporting roots"

@@ -8,12 +8,13 @@ export default async function AskPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Ask · Grounded reasoning"
+        eyebrow="Ask · Guided judgment"
         title="Ask Atlas"
         description={
           <p>
-            Ask across the reviewed atlas. Answers are bounded by retrieved
-            concepts and exact stored source segments.
+            Ask a question about the atlas. Answers distinguish available
+            evidence from inference, cite exact stored source segments, and say
+            when the current evidence is insufficient.
           </p>
         }
       />

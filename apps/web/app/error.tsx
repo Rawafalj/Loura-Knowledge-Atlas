@@ -9,7 +9,7 @@ export default function RouteError({ reset }: { reset: () => void }) {
       <h1>This part of the workspace did not load.</h1>
       <p>
         Your workspace data has not been changed. Try again, or return home and
-        choose another task while we recover this view.
+        return to the atlas while we recover this view.
       </p>
       <div className="button-row">
         <button
@@ -19,8 +19,8 @@ export default function RouteError({ reset }: { reset: () => void }) {
         >
           Try again
         </button>
-        <Link className="ui-button ui-button--secondary" href="/home">
-          Return home
+        <Link className="ui-button ui-button--secondary" href="/atlas">
+          Return to atlas
         </Link>
       </div>
     </main>
