@@ -24,11 +24,11 @@ export default async function SourcesPage() {
     <>
       <PageHeader
         eyebrow="Curate · Private evidence"
-        title="Source library"
+        title="Evidence library"
         description={
           <p>
-            Immutable originals, parser-versioned documents, and exact
-            structural segments—the evidence layer beneath later citations.
+            Add and inspect the sources behind your work. Completed sources
+            become the evidence that later answers can cite.
           </p>
         }
         actions={

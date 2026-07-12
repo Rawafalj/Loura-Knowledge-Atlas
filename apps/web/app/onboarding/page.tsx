@@ -15,10 +15,10 @@ export default async function OnboardingPage() {
   return (
     <main className="auth-page">
       <p className="eyebrow">First owner setup</p>
-      <h1>Create the private atlas workspace</h1>
+      <h1>Start with a useful outcome</h1>
       <p>
-        The first authenticated user becomes owner. Seed entries remain draft
-        until deliberately reviewed.
+        Set up a private space to understand Loura, work from evidence, and
+        choose what to learn next. You can change the structure later.
       </p>
       <OnboardingForm />
     </main>

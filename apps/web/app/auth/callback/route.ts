@@ -4,11 +4,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
-  const requestedNext = request.nextUrl.searchParams.get("next") ?? "/atlas";
+  const requestedNext = request.nextUrl.searchParams.get("next") ?? "/home";
   const next =
     requestedNext.startsWith("/") && !requestedNext.startsWith("//")
       ? requestedNext
-      : "/atlas";
+      : "/home";
   if (code) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);

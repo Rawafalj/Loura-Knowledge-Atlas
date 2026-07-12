@@ -8,7 +8,8 @@ import { signOut } from "@/app/atlas/actions";
 import { CommandPalette } from "./search/command-palette";
 
 const primaryNavigation = [
-  { href: "/map", label: "Explore", hint: "Semantic map" },
+  { href: "/home", label: "Home", hint: "Next useful action" },
+  { href: "/atlas", label: "Understand", hint: "Knowledge landscape" },
   { href: "/paths", label: "Learn", hint: "Guided paths" },
   { href: "/ask", label: "Ask", hint: "Cited answers" },
 ];
@@ -26,7 +27,7 @@ export function WorkspaceShell({
     <div className="app-shell">
       <aside className="app-sidebar">
         <Link
-          href="/atlas"
+          href="/home"
           className="brand-mark"
           aria-label="Loura Knowledge Atlas home"
         >
@@ -39,20 +40,35 @@ export function WorkspaceShell({
           </span>
         </Link>
         <nav aria-label="Atlas navigation">
-          <p className="nav-label">Start here</p>
+          <p className="nav-label">Your workspace</p>
           {primaryNavigation.map((item) => (
-            <Link href={item.href} key={item.href} className="nav-link nav-link--primary">
+            <Link
+              href={item.href}
+              key={item.href}
+              className="nav-link nav-link--primary"
+            >
               <span>{item.label}</span>
               <small>{item.hint}</small>
             </Link>
           ))}
           <details className="nav-more">
-            <summary>More workspace tools</summary>
+            <summary>Library and management</summary>
             <div>
-              <Link href="/mastery" className="nav-link">Mastery</Link>
-              <Link href="/sources" className="nav-link">Sources</Link>
-              <Link href="/review" className="nav-link">Review queue</Link>
-              <Link href="/applications" className="nav-link">Loura applications</Link>
+              <Link href="/sources" className="nav-link">
+                Evidence library
+              </Link>
+              <Link href="/mastery" className="nav-link">
+                My learning progress
+              </Link>
+              <Link href="/map" className="nav-link">
+                Semantic map
+              </Link>
+              <Link href="/applications" className="nav-link">
+                Loura decisions
+              </Link>
+              <Link href="/review" className="nav-link">
+                Review changes
+              </Link>
             </div>
           </details>
         </nav>

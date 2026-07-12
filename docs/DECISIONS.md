@@ -329,3 +329,29 @@ The semantic-map bundle adds a client-only canvas dependency and remains bounded
 ### Validation or reversal trigger
 
 Revisit the renderer if measured interaction performance is poor at the configured cap, or if users cannot reliably navigate concepts and relation types through the paired non-graph view.
+
+---
+
+## ADR-010 — Task-led first-use and workspace navigation
+
+**Status:** Accepted
+**Date:** 2026-07-12
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+The initial interface exposed the atlas data model—domains, concepts, relations, sources, proposals, mastery, and applications—before a user could identify a clear first outcome. Product-owner review found the resulting experience complex and unclear.
+
+### Decision
+
+Make Home the authenticated entry point and organize primary navigation around user outcomes: Home, Understand, Learn, and Ask. Move evidence, personal progress, semantic map, decisions, and review into a secondary library/management area. Onboarding asks only for a workspace name, a desired first outcome, and whether to install the recommended starter atlas; the internal workspace slug is generated automatically. Home presents one recommended next action based on the selected goal, source readiness, and learning readiness.
+
+### Alternatives considered
+
+- Retain the original data-model navigation and add explanatory copy — rejected because it still requires users to learn internal concepts before achieving value.
+- Default the workspace to the semantic map — rejected because maps are not useful before meaningful connected content exists.
+- Remove curator tools entirely — rejected because private evidence, human review, and auditability remain core product safeguards.
+
+### Consequences
+
+Curator capability remains available but is progressively disclosed. Empty and error states must explain the current readiness condition and guide the user to a useful next action. The graph remains a supporting exploration surface rather than the default first-use experience.

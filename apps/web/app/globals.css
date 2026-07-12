@@ -424,6 +424,14 @@ a:hover {
   max-width: 34rem;
 }
 
+.recovery-page {
+  max-width: 42rem;
+}
+
+.recovery-page p:not(.eyebrow) {
+  max-width: 38rem;
+}
+
 .stack {
   display: grid;
   gap: 0.75rem;
@@ -502,6 +510,71 @@ button.secondary {
 
 .checkbox-row input {
   min-height: auto;
+}
+
+.checkbox-row span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.checkbox-row small {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.starting-point-picker {
+  border: 0;
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+}
+
+.starting-point-picker legend {
+  font-weight: 650;
+  padding: 0;
+}
+
+.starting-point-picker > p {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: -0.2rem 0 0.2rem;
+}
+
+.starting-point-picker > label {
+  align-items: start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  cursor: pointer;
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.85rem;
+}
+
+.starting-point-picker > label:has(input:checked) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.starting-point-picker input {
+  accent-color: var(--accent);
+  margin-top: 0.2rem;
+  min-height: auto;
+}
+
+.starting-point-picker span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.starting-point-picker small {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .message {
@@ -1110,7 +1183,10 @@ button.secondary {
   padding: 1rem;
   position: relative;
   text-decoration: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .atlas-action-card:hover {
@@ -2018,6 +2094,127 @@ button.secondary {
   font-size: 0.78rem;
 }
 
+.home-recommendation {
+  align-items: stretch;
+  background: var(--surface-strong);
+  border: 1px solid var(--line-strong);
+  border-radius: 0.85rem;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 16rem);
+  margin-bottom: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.home-recommendation h2 {
+  margin: 0.25rem 0 0.55rem;
+}
+
+.home-recommendation p {
+  font-size: 1rem;
+  margin: 0 0 1.25rem;
+  max-width: 43rem;
+}
+
+.home-recommendation__status {
+  align-content: start;
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+}
+
+.home-recommendation__status span,
+.home-recommendation__status small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.home-recommendation__status strong {
+  font-size: 1.5rem;
+}
+
+.home-recommendation__status small {
+  line-height: 1.45;
+}
+
+.home-mode-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 1.25rem 0 3rem;
+}
+
+.home-mode-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 15rem;
+  padding: 1.25rem;
+}
+
+.home-mode-card h2 {
+  font-size: 1.15rem;
+  margin: 0.25rem 0 0.65rem;
+}
+
+.home-mode-card p:not(.eyebrow) {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.home-context {
+  border-top: 1px solid var(--line);
+  padding-top: 2rem;
+}
+
+.home-context__metrics {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--line);
+}
+
+.home-context__metrics > div {
+  background: var(--surface);
+  display: grid;
+  gap: 0.2rem;
+  padding: 1rem;
+}
+
+.home-context__metrics strong {
+  font-size: 1.55rem;
+}
+
+.home-context__metrics span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.home-context__notice {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.home-context__notice p {
+  flex: 1;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.home-context__notice a {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 @media (max-width: 900px) {
   .semantic-map-legend {
     grid-template-columns: 1fr;
@@ -2030,6 +2227,23 @@ button.secondary {
 
   .semantic-force-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .home-recommendation,
+  .home-mode-grid,
+  .home-context__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .home-recommendation__status {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 1rem 0 0;
+  }
+
+  .home-context__notice {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

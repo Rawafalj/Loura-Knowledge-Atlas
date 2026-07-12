@@ -22,12 +22,12 @@ export function LoginForm() {
         required
       />
       <button type="submit" disabled={pending}>
-        {pending ? "Sending…" : "Send magic link"}
+        {pending ? "Sending…" : "Send private sign-in link"}
       </button>
       {state.message ? (
         <p
           className={state.status === "error" ? "message error" : "message"}
-          role="status"
+          role={state.status === "error" ? "alert" : "status"}
         >
           {state.message}
         </p>

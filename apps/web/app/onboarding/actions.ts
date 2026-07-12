@@ -10,9 +10,23 @@ export type OnboardingState = { status: "idle" | "error"; message: string };
 
 const onboardingSchema = z.object({
   name: z.string().trim().min(2).max(80),
-  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  startingPoint: z.enum(["understand", "learn", "evidence", "apply"]),
   installSeed: z.boolean(),
 });
+
+function generatedWorkspaceSlug(name: string): string {
+  const normalized = name
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48);
+  const base = normalized || "loura-workspace";
+  return `${base}-${crypto.randomUUID().slice(0, 8)}`;
+}
 
 export async function createWorkspace(
   _previousState: OnboardingState,
@@ -21,22 +35,26 @@ export async function createWorkspace(
   await requireAuthenticatedUser();
   const parsed = onboardingSchema.safeParse({
     name: formData.get("name"),
-    slug: formData.get("slug"),
+    startingPoint: formData.get("startingPoint"),
     installSeed: formData.get("installSeed") === "on",
   });
   if (!parsed.success) {
     return {
       status: "error",
-      message: "Enter a valid workspace name and lowercase URL slug.",
+      message: "Name the workspace and choose a starting point.",
     };
   }
   try {
-    await bootstrapWorkspace(parsed.data);
+    await bootstrapWorkspace({
+      name: parsed.data.name,
+      slug: generatedWorkspaceSlug(parsed.data.name),
+      installSeed: parsed.data.installSeed,
+    });
   } catch {
     return {
       status: "error",
-      message: "Workspace setup failed. The slug may already be in use.",
+      message: "Workspace setup failed. Try again in a moment.",
     };
   }
-  redirect("/atlas");
+  redirect(`/home?start=${parsed.data.startingPoint}`);
 }
