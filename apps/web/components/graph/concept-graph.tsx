@@ -32,7 +32,13 @@ const categoryColor: Record<string, string> = {
   epistemic: "#526b73",
 };
 
-export function ConceptGraph({ dataset }: { dataset: ConceptNeighborhood }) {
+export function ConceptGraph({
+  dataset,
+  scope = "local",
+}: {
+  dataset: ConceptNeighborhood;
+  scope?: "local" | "semantic";
+}) {
   const [depth, setDepth] = useState<1 | 2>(1);
   const relationKeys = useMemo(
     () => [...new Set(dataset.edges.map((edge) => edge.relationKey))].sort(),
@@ -46,11 +52,16 @@ export function ConceptGraph({ dataset }: { dataset: ConceptNeighborhood }) {
   const router = useRouter();
   const neighborhood = useMemo(
     () =>
-      filterConceptNeighborhood(dataset, {
-        depth,
-        relationKeys: [...enabledKeys],
-      }),
-    [dataset, depth, enabledKeys],
+      scope === "semantic"
+        ? {
+            ...dataset,
+            edges: dataset.edges.filter((edge) => enabledKeys.has(edge.relationKey)),
+          }
+        : filterConceptNeighborhood(dataset, {
+            depth,
+            relationKeys: [...enabledKeys],
+          }),
+    [dataset, depth, enabledKeys, scope],
   );
 
   useEffect(() => {
@@ -102,16 +113,23 @@ export function ConceptGraph({ dataset }: { dataset: ConceptNeighborhood }) {
   return (
     <div className="graph-explorer">
       <div className="graph-toolbar" aria-label="Graph controls">
-        <label>
-          <span>Expansion depth</span>
-          <select
-            value={depth}
-            onChange={(event) => setDepth(event.target.value === "2" ? 2 : 1)}
-          >
-            <option value="1">One hop</option>
-            <option value="2">Two hops</option>
-          </select>
-        </label>
+        {scope === "local" ? (
+          <label>
+            <span>Expansion depth</span>
+            <select
+              value={depth}
+              onChange={(event) => setDepth(event.target.value === "2" ? 2 : 1)}
+            >
+              <option value="1">One hop</option>
+              <option value="2">Two hops</option>
+            </select>
+          </label>
+        ) : (
+          <div className="graph-map-mode">
+            <span>Semantic map</span>
+            <strong>Workspace-wide view</strong>
+          </div>
+        )}
         <fieldset>
           <legend>Relationship types</legend>
           <div className="graph-filter-list">
@@ -142,7 +160,12 @@ export function ConceptGraph({ dataset }: { dataset: ConceptNeighborhood }) {
           <p>The equivalent relationship list remains available below.</p>
         </div>
       ) : positioned ? (
-        <div className="graph-canvas" aria-label="Local concept graph">
+        <div
+          className="graph-canvas"
+          aria-label={
+            scope === "semantic" ? "Workspace semantic map" : "Local concept graph"
+          }
+        >
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -166,7 +189,9 @@ export function ConceptGraph({ dataset }: { dataset: ConceptNeighborhood }) {
         </div>
       ) : (
         <div className="graph-loading" role="status">
-          Laying out the bounded neighborhood…
+          {scope === "semantic"
+            ? "Laying out the semantic map…"
+            : "Laying out the bounded neighborhood…"}
         </div>
       )}
 

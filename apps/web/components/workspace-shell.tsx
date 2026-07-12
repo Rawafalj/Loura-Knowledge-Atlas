@@ -8,7 +8,7 @@ import { signOut } from "@/app/atlas/actions";
 import { CommandPalette } from "./search/command-palette";
 
 const primaryNavigation = [
-  { href: "/atlas", label: "Explore", hint: "Knowledge landscape" },
+  { href: "/map", label: "Explore", hint: "Semantic map" },
   { href: "/paths", label: "Learn", hint: "Guided paths" },
   { href: "/ask", label: "Ask", hint: "Cited answers" },
 ];

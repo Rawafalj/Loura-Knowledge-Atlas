@@ -107,7 +107,7 @@ export default async function WorldMapPage() {
           <p>Start with one clear action. You can always go deeper later.</p>
         </div>
         <div className="atlas-action-grid">
-          <Link className="atlas-action-card atlas-action-card--explore" href="#domains">
+          <Link className="atlas-action-card atlas-action-card--explore" href="/map">
             <span className="atlas-action-card__icon" aria-hidden="true">◌</span>
             <span className="atlas-action-card__body">
               <strong>Explore the atlas</strong>

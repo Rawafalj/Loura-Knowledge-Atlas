@@ -1765,6 +1765,23 @@ button.secondary {
   padding: 0;
 }
 
+.graph-map-mode {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.graph-map-mode span {
+  color: var(--faint);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.graph-map-mode strong {
+  font-size: 0.9rem;
+}
+
 .graph-toolbar > label > span,
 .graph-toolbar legend {
   color: var(--faint);
@@ -1885,6 +1902,58 @@ button.secondary {
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 700;
+}
+
+.semantic-map-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 1rem 3rem rgb(29 33 31 / 6%);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.semantic-map-panel__header {
+  align-items: end;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.semantic-map-panel__header h2 {
+  margin: 0.2rem 0 0;
+}
+
+.semantic-map-legend {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 1rem;
+}
+
+.semantic-map-legend div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem 1rem;
+}
+
+.semantic-map-legend span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 900px) {
+  .semantic-map-legend {
+    grid-template-columns: 1fr;
+  }
+
+  .semantic-map-panel__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .graph-list-fallback .table-scroll {
