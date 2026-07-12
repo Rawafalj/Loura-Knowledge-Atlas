@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Badge, EmptyState, PageHeader } from "@loura/ui";
 
-import { ConceptGraph } from "@/components/graph/concept-graph";
+import { GraphRelationList } from "@/components/graph/graph-relation-list";
+import { SemanticForceGraph } from "@/components/graph/semantic-force-graph";
 import { getSemanticMap } from "@/lib/atlas/neighborhood-query";
 import { requireWorkspaceMembership } from "@/lib/auth/session";
 
@@ -38,7 +39,11 @@ export default async function SemanticMapPage() {
               {map.nodes.length} concepts · {map.edges.length} connections
             </span>
           </div>
-          <ConceptGraph dataset={map} scope="semantic" />
+          <SemanticForceGraph dataset={map} />
+          <details className="graph-list-fallback">
+            <summary>Open the semantic map as an accessible relationship list</summary>
+            <GraphRelationList neighborhood={map} />
+          </details>
         </section>
       ) : (
         <EmptyState

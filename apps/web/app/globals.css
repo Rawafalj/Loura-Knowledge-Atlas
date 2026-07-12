@@ -1765,23 +1765,6 @@ button.secondary {
   padding: 0;
 }
 
-.graph-map-mode {
-  display: grid;
-  gap: 0.2rem;
-}
-
-.graph-map-mode span {
-  color: var(--faint);
-  font-size: 0.68rem;
-  font-weight: 750;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.graph-map-mode strong {
-  font-size: 0.9rem;
-}
-
 .graph-toolbar > label > span,
 .graph-toolbar legend {
   color: var(--faint);
@@ -1924,6 +1907,96 @@ button.secondary {
   margin: 0.2rem 0 0;
 }
 
+.semantic-force-graph {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.semantic-force-toolbar {
+  align-items: start;
+  background: linear-gradient(120deg, #eef6ef, #f9faf4 62%, #f1edf8);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(12rem, 0.6fr) minmax(0, 1.4fr);
+  padding: 1rem;
+}
+
+.semantic-force-toolbar p {
+  margin: 0 0 0.2rem;
+}
+
+.semantic-force-toolbar strong {
+  font-size: 0.92rem;
+}
+
+.semantic-force-toolbar fieldset {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.semantic-force-toolbar legend {
+  color: var(--faint);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+}
+
+.semantic-force-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+}
+
+.semantic-force-filters label {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 650;
+  gap: 0.35rem;
+}
+
+.semantic-force-filters input {
+  min-height: auto;
+}
+
+.semantic-force-canvas {
+  height: 35rem;
+  touch-action: none;
+}
+
+.semantic-force-canvas canvas {
+  display: block;
+}
+
+.semantic-force-loading {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 0.85rem;
+  height: 100%;
+  justify-content: center;
+}
+
+.semantic-force-inspector {
+  align-items: center;
+  background: var(--surface-strong);
+  border-top: 1px solid var(--line);
+  display: flex;
+  font-size: 0.8rem;
+  gap: 0.45rem;
+  min-height: 3rem;
+  padding: 0.6rem 0.9rem;
+}
+
+.semantic-force-inspector span {
+  color: var(--muted);
+}
+
 .semantic-map-legend {
   display: grid;
   gap: 0.75rem;
@@ -1953,6 +2026,10 @@ button.secondary {
   .semantic-map-panel__header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .semantic-force-toolbar {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -299,3 +299,33 @@ Explicit URLs are restricted to HTTP/HTTPS, standard ports, approved MIME types,
 ### Consequences
 
 Worker images and lockfiles are larger, but web and health startup stay lightweight. Parser upgrades or profile changes create a new immutable version. Retries reuse the same version key and never duplicate completed segments. Malware scanning and isolated conversion infrastructure remain release-hardening concerns; v0.1 accepts only explicitly supported formats and treats all parsed content as non-executable.
+
+---
+
+## ADR-009 — Force-directed renderer for workspace semantic maps
+
+**Status:** Accepted
+**Date:** 2026-07-12
+**Decision owners:** Rawaf / Loura, implementation lead
+
+### Context
+
+React Flow with an ELK layered layout remains effective for a bounded local concept neighborhood, but it presents a workspace-wide semantic network as a process diagram. The product owner explicitly requested a more intuitive semantic map that communicates clusters, proximity, and exploratory navigation.
+
+### Decision
+
+Keep React Flow plus ELK for local, relationship-focused concept views. Add the MIT-licensed `react-force-graph-2d` renderer exclusively for the bounded workspace semantic-map route. The renderer consumes the same canonical concepts and typed relations from PostgreSQL; it does not add a graph database, alter graph truth, or persist layout coordinates. The relationship-table fallback remains available for keyboard and screen-reader access.
+
+### Alternatives considered
+
+- Continue using ELK for the global map — rejected because its layered presentation obscures semantic proximity and clustering.
+- Adopt a graph database — rejected because visualization needs do not change the canonical data or traversal requirements.
+- Build a custom force simulation — rejected because a mature, focused renderer reduces rendering and interaction risk.
+
+### Consequences
+
+The semantic-map bundle adds a client-only canvas dependency and remains bounded by the configured node cap. Node click and hover interactions must always preserve a readable list fallback, and the existing local graph remains deterministic for detail pages.
+
+### Validation or reversal trigger
+
+Revisit the renderer if measured interaction performance is poor at the configured cap, or if users cannot reliably navigate concepts and relation types through the paired non-graph view.

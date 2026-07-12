@@ -23,6 +23,7 @@ Versions were checked against npm and PyPI on 2026-07-10 and are pinned in lockf
 | PostCSS        |  8.5.16 | CSS transformation pipeline                            | MIT           |
 | React Flow     | 12.11.2 | Bounded local graph interaction                        | MIT           |
 | ELK.js         |  0.11.1 | Deterministic layered graph layout                     | EPL-2.0       |
+| react-force-graph-2d | 1.24.3 | Bounded workspace semantic-map rendering              | MIT           |
 | Docling        | 2.110.0 | Deterministic document conversion and structural parse | MIT           |
 | HTTPX          |  0.28.1 | Size-bounded, redirect-controlled URL retrieval        | BSD-3-Clause  |
 | Psycopg        |   3.3.4 | Worker PostgreSQL and durable `pgmq` access            | LGPL-3.0-only |
