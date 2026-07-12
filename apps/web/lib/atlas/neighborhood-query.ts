@@ -33,7 +33,8 @@ export async function getSemanticMap(workspaceId: string): Promise<ConceptNeighb
   const concepts = world.concepts
     .filter((concept) => concept.content_status !== "deprecated")
     .slice(0, cap);
-  if (!concepts.length) {
+  const firstConcept = concepts[0];
+  if (!firstConcept) {
     return {
       selectedConceptId: "00000000-0000-0000-0000-000000000000",
       nodes: [],
@@ -99,7 +100,7 @@ export async function getSemanticMap(workspaceId: string): Promise<ConceptNeighb
   });
 
   return conceptNeighborhoodSchema.parse({
-    selectedConceptId: concepts[0].id,
+    selectedConceptId: firstConcept.id,
     nodes: concepts.map((concept) => ({
       id: concept.id,
       slug: concept.slug,
