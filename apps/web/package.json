@@ -17,7 +17,7 @@
     "@loura/atlas-schema": "workspace:*",
     "@loura/ui": "workspace:*",
     "@mdxeditor/editor": "4.0.4",
-    "@supabase/ssr": "0.12.0",
+    "@supabase/ssr": "0.12.3",
     "@supabase/supabase-js": "2.110.2",
     "@xyflow/react": "12.11.2",
     "elkjs": "0.11.1",
